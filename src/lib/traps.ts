@@ -86,21 +86,21 @@ export const getTestTraps = (field: string = "bar_scoda", studentId?: string): T
   }
 };
 
-export const saveTestTrap = (trap: Omit<TestTrap, "id" | "createdAt">, studentId?: string) => {
-  const traps = getTestTraps("bar_scoda", studentId);
+export const saveTestTrap = (trap: Omit<TestTrap, "id" | "createdAt">, field: string = "bar_scoda", studentId?: string) => {
+  const traps = getTestTraps(field, studentId);
   const newTrap: TestTrap = {
     ...trap,
     id: `TRAP-${Date.now()}`,
     createdAt: new Date().toLocaleDateString("fa-IR")
   };
-  const storageKey = studentId ? `chatre_test_traps_${studentId}` : "chatre_test_traps";
+  const storageKey = studentId ? `chatre_test_traps_${studentId}` : `chatre_test_traps_${field}`;
   localStorage.setItem(storageKey, JSON.stringify([newTrap, ...traps]));
   return newTrap;
 };
 
-export const deleteTestTrap = (id: string, studentId?: string) => {
-  const traps = getTestTraps("bar_scoda", studentId);
+export const deleteTestTrap = (id: string, field: string = "bar_scoda", studentId?: string) => {
+  const traps = getTestTraps(field, studentId);
   const filtered = traps.filter(t => t.id !== id);
-  const storageKey = studentId ? `chatre_test_traps_${studentId}` : "chatre_test_traps";
+  const storageKey = studentId ? `chatre_test_traps_${studentId}` : `chatre_test_traps_${field}`;
   localStorage.setItem(storageKey, JSON.stringify(filtered));
 };

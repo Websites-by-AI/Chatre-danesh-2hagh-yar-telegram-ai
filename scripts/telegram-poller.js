@@ -6,6 +6,12 @@ const API_BASE = `https://api.telegram.org/bot${TG_TOKEN}`;
 // بارگذاری بانک تست‌های حقوقی
 const exams = JSON.parse(fs.readFileSync('/home/user/chatre-danesh-repo/huggingface-static/data/exams.json', 'utf-8'));
 
+// ایمن‌سازی متون حقوقی در برابر خطاهای Markdown تلگرام
+function safeMd(text = "") {
+  return String(text)
+    .replace(/[_*[\]()~`>#+\-=|{}.!\\]/g, '\\$&');
+}
+
 // منوی دائمی پایین چت (Persistent Keyboard)
 const BOT_PERSISTENT_KEYBOARD = {
   keyboard: [
@@ -49,7 +55,20 @@ async function tgCall(method, payload) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
-    return await res.json();
+    const data = await res.json();
+    if (!data.ok) {
+      // اگر در فرمت Markdown خطا داد، فال‌بک به فرمت ساده متنی بدون استایل
+      if (payload.parse_mode) {
+        delete payload.parse_mode;
+        const retryRes = await fetch(`${API_BASE}/${method}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        return await retryRes.json();
+      }
+    }
+    return data;
   } catch (e) {
     console.error(`Error calling ${method}:`, e.message);
     return null;
@@ -324,7 +343,6 @@ async function handleUpdate(update) {
 // حلقه پردازش Long-Polling
 let offset = 0;
 async function pollUpdates() {
-  console.log("🔄 در حال گوش دادن به پیام‌های جدید تلگرام (Long Polling Mode)...");
   try {
     const res = await fetch(`${API_BASE}/getUpdates?offset=${offset}&timeout=20`);
     const data = await res.json();

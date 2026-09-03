@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ترنم مهر | شناساگر سال و درس سوالات کنکور (RAG)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <span class="logo">📚</span>
+      <h1>شناساگر هوشمند سوالات کنکور</h1>
+      <p>یک سوال کنکور را بچسبانید تا سال، درس و رشته‌ی آن را شناسایی کند — موتور RAG آموزشی ترنم مهر</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Stats -->
+    <section class="stats">
+      <div class="stat"><b id="statTotal">…</b><span>سوال در پایگاه دانش</span></div>
+      <div class="stat"><b id="statYears">…</b><span>سال کنکور پوشش‌داده‌شده</span></div>
+      <div class="stat"><b id="statSubjects">…</b><span>درس تخصصی</span></div>
+    </section>
+
+    <div id="yearChips" class="chips"></div>
+
+    <!-- Konkur structure panel -->
+    <div id="structure" class="structure"></div>
+
+    <!-- Loading -->
+    <div id="loading" class="loading"><span class="spinner"></span> در حال بارگذاری پایگاه دانش سوالات...</div>
+
+    <!-- Search box -->
+    <div id="ready" class="ready" style="display:none">
+      <p class="hint"><span id="countLoaded">۰</span> سوال بارگذاری شد — سوال خود را بنویسید یا بچسبانید:</p>
+      <textarea id="query" rows="4" placeholder="مثال: پمپ سدیم پتاسیم به ازای خروج هر ۳ یون سدیم چند یون پتاسیم وارد می‌کند؟"></textarea>
+      <button id="btn">🔍 شناسایی سال و درس</button>
+      <p class="tip">نکته: Ctrl + Enter برای جست‌وجوی سریع</p>
+
+      <div id="headline" class="headline"></div>
+      <div id="results" class="results"></div>
+    </div>
+
+    <!-- Bulk import: add your real Konkur questions -->
+    <div class="import-box">
+      <div class="import-head">➕ افزودن سوال (Import گروهی)</div>
+      <p class="import-note">سوالات واقعی کنکور خود را اینجا اضافه کنید. دو فرمت پشتیبانی می‌شود:<br>
+        <b>۱) JSON:</b> یک آرایه مثل <code>[{"question":"...","options":["a","b","c","d"],"answer":"a","year":"1403","subject":"زیست‌شناسی","field":"تجربی"}]</code><br>
+        <b>۲) خطی (با | جدا کنید):</b> سوال | گزینه۱،گزینه۲،گزینه۳،گزینه۴ | پاسخ | سال | درس | رشته</p>
+      <input type="file" id="importFile" accept=".json,.csv,.txt" class="import-file" />
+      <textarea id="importText" rows="5" placeholder='یک سوال در هر خط، مثلاً:&#10;در فتوسنتز واکنش نوری کجا رخ می‌دهد؟ | تیلاکوئید،استروما،آوند،میتوکندری | تیلاکوئید | 1401 | زیست‌شناسی | تجربی'></textarea>
+      <button id="importBtn">➕ افزودن به بانک</button>
+      <div id="importMsg" class="import-msg"></div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <p>ساخته‌شده با الگوی RAG • <a href="bank.html">🗂️ بانک سوالات</a> • <a href="practice.html">✍️ آزمون تمرینی</a> • <a href="https://github.com/Websites-by-AI/Taranom-psychology-school-10milion-panel" target="_blank" rel="noopener">پروژه روی GitHub</a> • داده‌ها قابل گسترش با Colab</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+name = "taranom-channel-poster"
+main = "worker.js"
+compatibility_date = "2026-05-31"
+
+[triggers]
+crons = ["30 6 * * *"]
+
+[ai]
+binding = "AI"
+
+[vars]
+CHANNEL_ID = "@ai_exam_iran"
+BALE_CHANNEL_ID = "@taranom_hamdeli_channel"
+EXAM_RAG_URL = "https://sosa123454321-taranom-exam-rag.static.hf.space"

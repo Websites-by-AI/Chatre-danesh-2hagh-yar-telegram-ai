@@ -1,0 +1,8 @@
+{
+  "name": "Taranom Hamdeli",
+  "description": "An AI-powered empathic educational platform featuring smart report card analysis, interactive exam sessions, personalized study planning, and psychological performance tracking for Iranian high school students.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ترنم مهر | آزمون تمرینی کنکور</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <span class="logo">✍️</span>
+      <h1>آزمون تمرینی کنکور</h1>
+      <p>یک رشته و درس را انتخاب کن، سوال‌ها را پاسخ بده و سال + سختی + نوع + پاسخ صحیح هر سوال را ببین</p>
+      <a href="index.html" class="back-link">↩ بازگشت به شناساگر سوال</a>
+      <a href="bank.html" class="back-link">🗂️ بانک سوالات</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Setup -->
+    <div id="setup" class="card-box">
+      <h2 class="card-title">تنظیم آزمون</h2>
+      <div class="filter-row">
+        <select id="pField" class="fsel"></select>
+        <select id="pSubject" class="fsel"></select>
+        <select id="pDiff" class="fsel"></select>
+      </div>
+      <label class="count-label">تعداد سوال:
+        <select id="pCount" class="fsel" style="width:auto">
+          <option value="5">۵ سوال</option>
+          <option value="10">۱۰ سوال</option>
+          <option value="15">۱۵ سوال</option>
+          <option value="20">۲۰ سوال</option>
+        </select>
+      </label>
+      <button id="startBtn" class="primary-btn">شروع آزمون 🚀</button>
+    </div>
+
+    <!-- Quiz -->
+    <div id="quiz" class="card-box" style="display:none">
+      <div id="progress" class="progress"></div>
+      <div id="qSource" class="qsource"></div>
+      <p id="qText" class="qtext"></p>
+      <div id="qOptions" class="qoptions"></div>
+      <div id="reveal" class="reveal" style="display:none">
+        <div id="revealHead" class="reveal-head"></div>
+        <div id="revealBody" class="reveal-body"></div>
+      </div>
+      <button id="nextBtn" class="primary-btn" style="display:none"></button>
+    </div>
+
+    <!-- Result -->
+    <div id="result" class="card-box" style="display:none">
+      <h2 class="card-title">پایان آزمون 🏁</h2>
+      <div id="scoreText" class="score-text"></div>
+      <button id="restartBtn" class="primary-btn">آزمون جدید 🔁</button>
+    </div>
+  </main>
+
+  <footer class="foot"><p>آزمون تمرینی کنکور ترنم مهر • متصل به RAG Space</p></footer>
+  <script src="practice.js"></script>
+</body>
+</html>

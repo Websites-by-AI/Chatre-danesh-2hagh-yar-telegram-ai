@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ترنم مهر | بانک سوالات کنکور</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <span class="logo">🗂️</span>
+      <h1>بانک سوالات کنکور</h1>
+      <p>یک رشته و درس را انتخاب کن تا همه‌ی سوالات کنکور آن موضوع را ببینی — متصل به پایگاه دانش RAG</p>
+      <a href="index.html" class="back-link">↩ بازگشت به شناساگر سوال</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Konkur structure reference -->
+    <div id="struct" class="struct-panel"></div>
+
+    <!-- Filters -->
+    <div class="filter-bar">
+      <div class="filter-row">
+        <select id="fField" class="fsel"></select>
+        <select id="fSubject" class="fsel"></select>
+        <select id="fYear" class="fsel"></select>
+      </div>
+      <input id="fSearch" class="fsearch" placeholder="🔍 جستجوی متن سوال..." />
+      <div class="filter-foot">
+        <button id="clearBtn" class="clear-btn">پاک‌کردن فیلترها</button>
+        <span class="count-label"><b id="count">۰</b> سوال از مجموع <b id="loaded">۰</b> سوال</span>
+      </div>
+    </div>
+
+    <!-- Question list -->
+    <div id="list" class="qlist"></div>
+  </main>
+
+  <footer class="foot">
+    <p>بانک سوالات کنکور ترنم مهر • <a href="practice.html">آزمون تمرینی</a> • متصل به RAG Space • <a href="https://github.com/Websites-by-AI/Taranom-psychology-school-10milion-panel" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="bank.js"></script>
+</body>
+</html>

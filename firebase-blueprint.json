@@ -1,0 +1,25 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique user ID" },
+        "email": { "type": "string", "description": "User email address" },
+        "mobile": { "type": "string", "description": "User mobile number" },
+        "displayName": { "type": "string", "description": "User full name" },
+        "password": { "type": "string", "description": "User password (hashed or plain for test)" },
+        "role": { "type": "string", "description": "User role (student, parent, admin, etc.)" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Account creation timestamp" }
+      },
+      "required": ["uid", "displayName", "role"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "User profiles collection"
+    }
+  }
+}

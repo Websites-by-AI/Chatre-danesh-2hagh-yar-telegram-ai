@@ -1,0 +1,17 @@
+{
+  "generatedAt": "2026-07-28T00:00:00Z",
+  "algorithm": "TF-IDF char-bigram cosine similarity",
+  "evaluation": "leave-one-out cross-validation",
+  "versions": [
+    {"label":"v1-initial","count":18,"yearAccuracy":11.1,"subjectAccuracy":61.1,"fieldAccuracy":88.9,"avgSimilarity":0.508},
+    {"label":"v2-expanded","count":40,"yearAccuracy":15.0,"subjectAccuracy":67.5,"fieldAccuracy":90.0,"avgSimilarity":0.540},
+    {"label":"v3-current","count":62,"yearAccuracy":22.6,"subjectAccuracy":67.7,"fieldAccuracy":91.9,"avgSimilarity":0.550}
+  ],
+  "improvement": {
+    "yearDetection": "+11.5%",
+    "subjectDetection": "+6.6%",
+    "fieldDetection": "+3.0%",
+    "bankGrowth": "244%",
+    "note": "دقت سال پایین است چون فقط ۶۲ سوال داریم (مثلا ۱۲ سوال در سال). با بانک واقعی کنکور (۱۵۵+ سوال در هر آزمون) دقت به‌طور قابل‌توجهی بالاتر می‌رود."
+  }
+}

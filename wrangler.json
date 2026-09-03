@@ -1,19 +1,19 @@
 {
-  "name": "taranom-mehr",
+  "name": "chatre-danesh-law-ai",
   "pages_build_output_dir": "dist",
   "compatibility_date": "2026-05-31",
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "taranom-mehr-db",
-      "database_id": "a92a7417-d1f1-407e-b0fd-1b6c912539d2",
-      "preview_database_id": "a92a7417-d1f1-407e-b0fd-1b6c912539d2"
+      "database_name": "chattre_danesh_db",
+      "database_id": "a2816f97-1f6c-4546-b7a5-932444db8578",
+      "preview_database_id": "a2816f97-1f6c-4546-b7a5-932444db8578"
     }
   ],
   "vars": {
     "HF_MODEL": "meta-llama/Llama-3.3-70B-Instruct:featherless-ai",
     "EXAM_RAG_URL": "https://sosa123454321-taranom-exam-rag.static.hf.space",
-    "CHANNEL_ID": "@ai_exam_iran",
+    "CHANNEL_ID": "@chatre_danesh_channel",
     "BOT_ADMIN_IDS": "93372553,1680853581"
   },
   "ai": {

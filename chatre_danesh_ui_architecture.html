@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>معماری و پیش‌نمایش رابط کاربری پلتفرم هوشمند موسسه چتر دانش</title>
+  <style>
+    @font-face {
+      font-family: 'Vazirmatn';
+      src: local('Vazirmatn'), local('Tahoma'), sans-serif;
+    }
+    :root {
+      --primary: #1e3a8a;
+      --primary-light: #3b82f6;
+      --primary-dark: #0f172a;
+      --accent: #f59e0b;
+      --accent-hover: #d97706;
+      --emerald: #10b981;
+      --rose: #ef4444;
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-card: #182234;
+      --border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Vazirmatn', system-ui, -apple-system, sans-serif;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #1e3a8a 100%);
+      border-b: 1px solid var(--border);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      position: relative;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 800;
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      margin-bottom: 1rem;
+    }
+    h1 {
+      font-size: 2rem;
+      font-weight: 900;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(to right, #ffffff, #93c5fd, #fcd34d);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .nav-tabs {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      background: var(--surface);
+      padding: 10px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tab-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+    }
+    .tab-btn.active {
+      background: var(--primary-light);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    .container {
+      max-width: 1300px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+    .section-view {
+      display: none;
+    }
+    .section-view.active {
+      display: block;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .mockup-frame {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+    .browser-bar {
+      background: #090d16;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .window-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+    .address-bar {
+      background: #1e293b;
+      color: #94a3b8;
+      font-size: 11px;
+      padding: 4px 16px;
+      border-radius: 8px;
+      width: 60%;
+      text-align: left;
+      direction: ltr;
+      font-family: monospace;
+    }
+    .screen-content {
+      padding: 1.5rem;
+      background: #0f172a;
+    }
+    .grid-2 { display: grid; grid-cols: 1fr; gap: 1.25rem; }
+    @media (min-width: 768px) { .grid-2 { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .grid-3 { grid-template-columns: repeat(3, 1fr); } .grid-4 { grid-template-columns: repeat(4, 1fr); } }
+    .grid-3 { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+    .grid-4 { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+    
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.25rem;
+      position: relative;
+    }
+    .stat-num {
+      font-size: 1.75rem;
+      font-weight: 900;
+      font-family: monospace, system-ui;
+    }
+    .badge-pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 800;
+    }
+    .bg-green-soft { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .bg-amber-soft { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .bg-blue-soft { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .bg-purple-soft { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+    
+    .tree-box {
+      border-left: 2px dashed #475569;
+      margin-right: 12px;
+      padding-right: 16px;
+    }
+    .tree-item {
+      position: relative;
+      margin-bottom: 12px;
+      padding: 10px 14px;
+      background: #1e293b;
+      border-radius: 12px;
+      border: 1px solid #334155;
+    }
+    .tree-item::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -16px;
+      width: 14px;
+      height: 2px;
+      background: #475569;
+    }
+    .chat-bubble {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 12px;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+    .chat-bot {
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      border-bottom-right-radius: 4px;
+      align-self: flex-start;
+    }
+    .chat-user {
+      background: #2563eb;
+      color: #fff;
+      border-bottom-left-radius: 4px;
+      margin-right: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="badge">⚖️ چتر دانش ۲۰۲۶ — اطلس معماری و پیش‌نمایش تصویری سامانه</div>
+    <h1>سامانه هوشمند آموزش و سنجش وکالت موسسه چتر دانش</h1>
+    <p class="subtitle">
+      معماری یکپارچه وب‌سایت، کارنامه ۶ درس وکالت، شبیه‌ساز قانون تسهیل، کارگاه آزمون شفاهی هوش مصنوعی، تله‌های مواد قانونی و ربات‌های بله و تلگرام
+    </p>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="nav-tabs">
+    <button class="tab-btn active" onclick="showTab('sitemap')">🗺️ نقشه درختی سایت</button>
+    <button class="tab-btn" onclick="showTab('screen-portal')">💻 اسکرین ۱: پرتال اصلی داوطلب</button>
+    <button class="tab-btn" onclick="showTab('screen-report')">📊 اسکرین ۲: کارنامه و قانون تسهیل</button>
+    <button class="tab-btn" onclick="showTab('screen-oral')">🎙️ اسکرین ۳: آزمون شفاهی اختبار با AI</button>
+    <button class="tab-btn" onclick="showTab('screen-traps')">🎯 اسکرین ۴: اطلس تله‌های قانونی</button>
+    <button class="tab-btn" onclick="showTab('screen-bot')">🤖 اسکرین ۵: ربات بله و تلگرام</button>
+    <button class="tab-btn" onclick="showTab('screen-crm')">💼 اسکرین ۶: پنل رتبه‌های برتر و CRM</button>
+  </nav>
+
+  <main class="container">
+
+    <!-- TAB 1: SITEMAP & ARCHITECTURE -->
+    <section id="sitemap" class="section-view active">
+      <div class="card" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, #1e293b, #0f172a);">
+        <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.75rem; color: #93c5fd;">
+          🏗️ ساختار کلی دسته‌بندی‌ها و صفحات سایت (Information Architecture)
+        </h2>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 1.5rem;">
+          ساختار مهندسی‌شده پرتال موسسه آموزش عالی آزاد چتر دانش در ۵ لایه اصلی سازمان‌دهی شده است:
+        </p>
+
+        <div class="grid-3">
+          
+          <!-- Column 1 -->
+          <div>
+            <div style="background: #1e3a8a; color: #fff; padding: 10px 14px; border-radius: 12px; font-weight: 800; font-size: 13px; margin-bottom: 10px;">
+              ۱. پیشخوان آموزشی داوطلب (Student Desk)
+            </div>
+            <div class="tree-box">
+              <div class="tree-item">
+                <strong style="color: #60a5fa; font-size: 12px;">📊 میزکار کایزن وکالت</strong>
+                <p style="font-size: 11px; color: #94a3b8;">روزشمار آزمون، ساعات مطالعه روزانه، نمودار تراز</p>
+              </div>
+              <div class="tree-item">
+                <strong style="color: #34d399; font-size: 12px;">📜 کارنامه هوشمند ۶ درس</strong>
+                <p style="font-size: 11px; color: #94a3b8;">تحلیل درصدهای مدنی، دادرسی، تجارت، جزا، فقه و اساسی</p>
+              </div>
+              <div class="tree-item">
+                <strong style="color: #fbbf24; font-size: 12px;">⚖️ ویجت تراز قانون تسهیل</strong>
+                <p style="font-size: 11px; color: #94a3b8;">محاسبه ۷۰٪ میانگین ۱٪ برتر (۶۰٪ ایثارگران)</p>
+              </div>
+              <div class="tree-item">
+                <strong style="color: #c084fc; font-size: 12px;">🗓️ برنامه‌ریز هفتگی نص‌محور</strong>
+                <p style="font-size: 11px; color: #94a3b8;">شیفت‌های صبح، عصر و شب با تفکیک مواد قانون</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2 -->
+          <div>
+            <div style="background: #065f46; color: #fff; padding: 10px 14px; border-radius: 12px; font-weight: 800; font-size: 13px; margin-bottom: 10px;">
+              ۲. ماژول‌های سنجش و هوش مصنوعی (AI Labs)
+            </div>
+            <div class="tree-box">
+              <div class="tree-item">
+                <strong style="color: #34d399; font-size: 12px;">🎙️ کارگاه آزمون شفاهی اختبار (Oral AI)</strong>
+                <p style="font-size: 11px; color: #94a3b8;">تحلیل گفتار صوتی، نمره‌دهی ۰-۲۰ و تصحیح استدلال</p>
+              </div>
+              <div class="tree-item">
+                <strong style="color: #f87171; font-size: 12px;">🎯 اطلس تله‌های تستی مواد قانونی</strong>
+                <p style="font-size: 11px; color: #94a3b8;">نمودار درختی خطاها در مواد ۴۰۱، ۳۰۰ و ۱۰۷</p>
+              </div>
+              <div class="tree-item">
+                <strong style="color: #60a5fa; font-size: 12px;">🔍 موتور جستجوی هوشمند Hugging Face RAG</strong>
+                <p style="font-size: 11px; color: #94a3b8;">تگ‌گذاری خودکار، استخراج آراء وحدت رویه و قوانین خاص</p>
+              </div>
+              <div class="tree-item">
+                <strong style="color: #fbbf24; font-size: 12px;">🧠 آزمایشگاه فراشناخت و روانشناسی</strong>
+                <p style="font-size: 11px; color: #94a3b8;">کنترل فرسودگی ذهنی، اضطراب آزمون و شتاب‌زدگی</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 3 -->
+          <div>
+            <div style="background: #7c2d12; color: #fff; padding: 10px 14px; border-radius: 12px; font-weight: 800; font-size: 13px; margin-bottom: 10px;">
+              ۳. ارتباطات، فروش و شبکه رتبه‌های برتر (CRM)
+            </div>
+            <div class="tree-box">
+              <div class="tree-item">
+                <strong style="color: #fbbf24; font-size: 12px;">🤖 ربات رسمی بله و تلگرام</strong>
+                <p style="font-size: 11px; color: #94a3b8;">تست روزانه، ورود ۱-کلیکی SSO و مشاوره آنلاین</p>
+              </div>
+              <div class="tree-item">
+                <strong style="color: #60a5fa; font-size: 12px;">🤝 باشگاه رتبه‌های برتر و معرف‌ها</strong>
+                <p style="font-size: 11px; color: #94a3b8;">کد تخفیف اختصاصی، پورسانت ۲۰٪ و تسویه با شماره شبا</p>
+              </div>
+              <div class="tree-item">
+                <strong style="color: #34d399; font-size: 12px;">🏫 کلینیک مهارت‌های عملی و موت‌کورت</strong>
+                <p style="font-size: 11px; color: #94a3b8;">رزرو جلسات شبیه‌ساز دادگاه و تصحیح لایحه‌نویسی</p>
+              </div>
+              <div class="tree-item">
+                <strong style="color: #c084fc; font-size: 12px;">🛡️ پنل ادمین و مانیتورینگ توزیع‌شده</strong>
+                <p style="font-size: 11px; color: #94a3b8;">لاگ D1، ارتباط با زرین‌پال، اتصال پایگاه وکتوری</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: SCREEN 1 - PORTAL -->
+    <section id="screen-portal" class="section-view">
+      <div class="mockup-frame">
+        <div class="browser-bar">
+          <div class="window-dots">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="address-bar">https://app.chatredanesh.ir/dashboard</div>
+          <span style="font-size: 11px; color: #94a3b8;">پرتال داوطلب چتر دانش</span>
+        </div>
+        
+        <div class="screen-content">
+          <!-- Top Bar -->
+          <div style="display: flex; justify-content: space-between; align-items: center; background: #1e293b; padding: 14px 20px; border-radius: 16px; margin-bottom: 1.5rem; border: 1px solid #334155;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 44px; height: 44px; background: linear-gradient(135deg, #1e3a8a, #3b82f6); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                ⚖️
+              </div>
+              <div>
+                <h3 style="font-size: 14px; font-weight: 800; color: #fff;">امیرحسین رضایی (داوطلب آزمون وکالت کانون مرکز)</h3>
+                <span style="font-size: 11px; color: #94a3b8;">شماره پرونده: CD-984210 • دوره آمادگی طلایی ۱۴۰۵</span>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <span class="badge-pill bg-green-soft">تراز آخرین آزمون: ۶,۷۲۰</span>
+              <span class="badge-pill bg-amber-soft">رتبه تخمینی: ۴۲۰ کشوری</span>
+            </div>
+          </div>
+
+          <!-- Quick Stats 4 Cols -->
+          <div class="grid-4" style="margin-bottom: 1.5rem;">
+            <div class="card">
+              <span style="font-size: 11px; color: var(--text-muted); display: block;">ساعت مطالعه هفتگی (کایزن)</span>
+              <div class="stat-num" style="color: #60a5fa;">۴۴.۵ <span style="font-size: 12px;">ساعت</span></div>
+              <span class="badge-pill bg-green-soft" style="margin-top: 4px;">+۶ ساعت نسبت به هفته پیش</span>
+            </div>
+            <div class="card">
+              <span style="font-size: 11px; color: var(--text-muted); display: block;">تست‌های حل شده هفته</span>
+              <div class="stat-num" style="color: #34d399;">۳۸۰ <span style="font-size: 12px;">تست</span></div>
+              <span style="font-size: 10px; color: #94a3b8;">دقت پاسخگویی: ۷۲٪</span>
+            </div>
+            <div class="card">
+              <span style="font-size: 11px; color: var(--text-muted); display: block;">مواد قانونی مرور شده</span>
+              <div class="stat-num" style="color: #fbbf24;">۲۱۵ <span style="font-size: 12px;">ماده</span></div>
+              <span style="font-size: 10px; color: #94a3b8;">عقود معین، ارث و صلاحیت‌ها</span>
+            </div>
+            <div class="card">
+              <span style="font-size: 11px; color: var(--text-muted); display: block;">تله‌های تستی شکار شده</span>
+              <div class="stat-num" style="color: #f87171;">۱۸ <span style="font-size: 12px;">تله</span></div>
+              <span class="badge-pill bg-purple-soft" style="margin-top: 4px;">آماده مرور شب آزمون</span>
+            </div>
+          </div>
+
+          <!-- Action Rows -->
+          <div class="grid-2">
+            <div class="card">
+              <h4 style="font-size: 13px; font-weight: 800; margin-bottom: 10px; color: #93c5fd;">🗓️ برنامه مطالعه امروز شما (چهارشنبه)</h4>
+              <div style="font-size: 11px; space-y: 8px;">
+                <div style="background: #0f172a; padding: 10px; border-radius: 10px; border-right: 3px solid #3b82f6; margin-bottom: 6px;">
+                  <strong>شیفت صبح (۰۸:۰۰ - ۱۱:۳۰):</strong> قانون‌خوانی مواد ۲۱۸ تا ۳۰۸ ق.م (معاملات به قصد فرار از دین و غصب)
+                </div>
+                <div style="background: #0f172a; padding: 10px; border-radius: 10px; border-right: 3px solid #10b981; margin-bottom: 6px;">
+                  <strong>شیفت عصر (۱۶:۰۰ - ۱۸:۳۰):</strong> ۵۰ تست زمان‌دار آیین دادرسی مدنی (صلاحیت دادگاه‌های صلح جدید)
+                </div>
+                <div style="background: #0f172a; padding: 10px; border-radius: 10px; border-right: 3px solid #f59e0b;">
+                  <strong>شیفت شب (۲۰:۳۰ - ۲۲:۰۰):</strong> بررسی آراء وحدت رویه سال ۱۴۰۳ در امور کیفری
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="background: linear-gradient(135deg, #1e1b4b, #1e293b);">
+              <h4 style="font-size: 13px; font-weight: 800; margin-bottom: 10px; color: #fbbf24;">🤖 پیام مشاور هوشمند چتر دانش</h4>
+              <p style="font-size: 12px; color: #cbd5e1; line-height: 1.7; margin-bottom: 12px;">
+                «امیرحسین عزیز؛ تسلط شما در درس آیین دادرسی مدنی به مرز ۷۵٪ رسیده است. اما بررسی پاسخ‌های منفی نشان می‌دهد در تست‌های قانون تجارت (مبحث ورشکستگی و اسناد تجاری) دچار تردید گزینه‌ای می‌شوید. پیشنهاد می‌کنم در برنامه فردا، ۱ پارت مرور نص مواد ۴۱۲ تا ۵۷۵ قانون تجارت را در اولویت بگذارید.»
+              </p>
+              <button style="background: #f59e0b; color: #0f172a; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 800; font-size: 11px; cursor: pointer;">
+                شروع کوییز ترمیمی حقوق تجارت ←
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: SCREEN 2 - REPORT CARD -->
+    <section id="screen-report" class="section-view">
+      <div class="mockup-frame">
+        <div class="browser-bar">
+          <div class="window-dots">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="address-bar">https://app.chatredanesh.ir/report-card/exam-4</div>
+          <span style="font-size: 11px; color: #94a3b8;">کارنامه هوشمند وکالت چتر دانش</span>
+        </div>
+
+        <div class="screen-content">
+          <!-- Facilitation Law Status Box -->
+          <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 95, 70, 0.3)); border: 1px solid rgba(16, 185, 129, 0.4); padding: 18px 24px; border-radius: 20px; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                <span style="font-size: 20px;">⚖️</span>
+                <h3 style="font-size: 15px; font-weight: 900; color: #34d399;">احراز قطعی حدنصاب قانون تسهیل صدور مجوزهای کسب‌وکار</h3>
+              </div>
+              <p style="font-size: 11.5px; color: #cbd5e1;">
+                تراز کسب‌شده شما: <strong style="font-family: monospace; color: #fff; font-size: 14px;">۶,۷۲۰</strong> | حدنصاب قبولی ۱٪ برتر (۷۰٪): <strong style="font-family: monospace; color: #fff;">۵,۷۴۰</strong> (شما <strong>+۹۸۰</strong> نمره تراز بالاتر از مرز قبولی هستید)
+              </p>
+            </div>
+            <span style="background: #10b981; color: #064e3b; font-weight: 900; padding: 8px 18px; border-radius: 12px; font-size: 12px;">
+              قبول قطعی آزمون وکالت ✓
+            </span>
+          </div>
+
+          <!-- Subject Table -->
+          <div class="card" style="margin-bottom: 1.5rem; overflow-x: auto;">
+            <table style="width: 100%; text-align: right; border-collapse: collapse; font-size: 12px;">
+              <thead>
+                <tr style="border-bottom: 1px solid #334155; color: #94a3b8;">
+                  <th style="padding: 10px;">عنوان درس حقوقی</th>
+                  <th style="padding: 10px; text-align: center;">ضریب</th>
+                  <th style="padding: 10px; text-align: center;">درصد خام</th>
+                  <th style="padding: 10px; text-align: center;">صحیح / غلط / نزده</th>
+                  <th style="padding: 10px; text-align: center;">تراز درس</th>
+                  <th style="padding: 10px;">تحلیل آسیب‌شناسی چتر دانش</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid #1e293b;">
+                  <td style="padding: 12px; font-weight: 800; color: #fff;">حقوق مدنی</td>
+                  <td style="padding: 12px; text-align: center; color: #fbbf24; font-weight: bold;">۳</td>
+                  <td style="padding: 12px; text-align: center; color: #34d399; font-weight: 900; font-family: monospace;">۶۵.۰٪</td>
+                  <td style="padding: 12px; text-align: center; font-family: monospace;">۱۴ / ۲ / ۴</td>
+                  <td style="padding: 12px; text-align: center; font-weight: 800; color: #60a5fa; font-family: monospace;">۶,۴۸۰</td>
+                  <td style="padding: 12px; font-size: 11px; color: #94a3b8;">تسلط عالی بر عقود معین؛ نیاز به مرور ارث و وصیت</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #1e293b;">
+                  <td style="padding: 12px; font-weight: 800; color: #fff;">آیین دادرسی مدنی</td>
+                  <td style="padding: 12px; text-align: center; color: #fbbf24; font-weight: bold;">۳</td>
+                  <td style="padding: 12px; text-align: center; color: #34d399; font-weight: 900; font-family: monospace;">۷۵.۰٪</td>
+                  <td style="padding: 12px; text-align: center; font-family: monospace;">۱۶ / ۲ / ۲</td>
+                  <td style="padding: 12px; text-align: center; font-weight: 800; color: #60a5fa; font-family: monospace;">۷,۱۰۰</td>
+                  <td style="padding: 12px; font-size: 11px; color: #94a3b8;">احاطه کامل بر مواعد و صلاحیت‌ها (نقطه قوت اصلی)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #1e293b;">
+                  <td style="padding: 12px; font-weight: 800; color: #fff;">حقوق تجارت</td>
+                  <td style="padding: 12px; text-align: center; color: #fbbf24; font-weight: bold;">۲</td>
+                  <td style="padding: 12px; text-align: center; color: #fbbf24; font-weight: 900; font-family: monospace;">۶۰.۰٪</td>
+                  <td style="padding: 12px; text-align: center; font-family: monospace;">۱۳ / ۳ / ۴</td>
+                  <td style="padding: 12px; text-align: center; font-weight: 800; color: #60a5fa; font-family: monospace;">۵,۹۲۰</td>
+                  <td style="padding: 12px; font-size: 11px; color: #94a3b8;">تله در لایحه اصلاحی شرکت‌های سهامی</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #1e293b;">
+                  <td style="padding: 12px; font-weight: 800; color: #fff;">حقوق جزا (عمومی و اختصاصی)</td>
+                  <td style="padding: 12px; text-align: center; color: #fbbf24; font-weight: bold;">۲</td>
+                  <td style="padding: 12px; text-align: center; color: #34d399; font-weight: 900; font-family: monospace;">۸۰.۰٪</td>
+                  <td style="padding: 12px; text-align: center; font-family: monospace;">۱۷ / ۱ / ۲</td>
+                  <td style="padding: 12px; text-align: center; font-weight: 800; color: #60a5fa; font-family: monospace;">۷,۴۵۰</td>
+                  <td style="padding: 12px; font-size: 11px; color: #94a3b8;">دقت ۹۵٪ در قانون کاهش حبس تعزیری</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #1e293b;">
+                  <td style="padding: 12px; font-weight: 800; color: #fff;">آیین دادرسی کیفری</td>
+                  <td style="padding: 12px; text-align: center; color: #fbbf24; font-weight: bold;">۲</td>
+                  <td style="padding: 12px; text-align: center; color: #34d399; font-weight: 900; font-family: monospace;">۸۵.۰٪</td>
+                  <td style="padding: 12px; text-align: center; font-family: monospace;">۱۸ / ۱ / ۱</td>
+                  <td style="padding: 12px; text-align: center; font-weight: 800; color: #60a5fa; font-family: monospace;">۷,۸۰۰</td>
+                  <td style="padding: 12px; font-size: 11px; color: #94a3b8;">عملکرد درخشان در صلاحیت دادسرا و قرارهای تأمین</td>
+                </tr>
+                <tr>
+                  <td style="padding: 12px; font-weight: 800; color: #fff;">اصول فقه و متون فقه</td>
+                  <td style="padding: 12px; text-align: center; color: #fbbf24; font-weight: bold;">۱</td>
+                  <td style="padding: 12px; text-align: center; color: #f87171; font-weight: 900; font-family: monospace;">۵۵.۰٪</td>
+                  <td style="padding: 12px; text-align: center; font-family: monospace;">۱۲ / ۳ / ۵</td>
+                  <td style="padding: 12px; text-align: center; font-weight: 800; color: #60a5fa; font-family: monospace;">۵,۴۱۰</td>
+                  <td style="padding: 12px; font-size: 11px; color: #94a3b8;">نیاز به تثبیت اصول عملیه (استصحاب و برائت)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: SCREEN 3 - ORAL EXAM AI -->
+    <section id="screen-oral" class="section-view">
+      <div class="mockup-frame">
+        <div class="browser-bar">
+          <div class="window-dots">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="address-bar">https://app.chatredanesh.ir/oral-examiner</div>
+          <span style="font-size: 11px; color: #94a3b8;">کارگاه مصاحبه و آزمون شفاهی اختبار با AI</span>
+        </div>
+
+        <div class="screen-content">
+          <div class="grid-3" style="margin-bottom: 1.5rem;">
+            <!-- Question Box -->
+            <div class="card" style="grid-column: span 2; background: #1e293b;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <span class="badge-pill bg-blue-soft">درس: حقوق مدنی (عقود و هبه)</span>
+                <span style="font-size: 11px; color: #94a3b8;">زمان پاسخگویی: ۱۲۰ ثانیه</span>
+              </div>
+              <h3 style="font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 12px; line-height: 1.7;">
+                ❓ مسئله اختبار: «ماده ۸۰۳ قانون مدنی حق رجوع واهب پس از عقد هبه را مطرح می‌سازد. در فرضی که واهب مال موهوبه را به دیگری فروخته باشد، این اقدام بیع فضولی است یا رجوع ضمنی از هبه تلقی خواهد شد؟ مستدلاً بیان نمایید.»
+              </h3>
+              
+              <!-- Speech Recognition Simulation -->
+              <div style="background: #0f172a; padding: 14px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 14px;">
+                <span style="font-size: 10px; color: #94a3b8; display: block; margin-bottom: 4px;">متن استخراج‌شده از گفتار داوطلب (Speech to Text):</span>
+                <p style="font-size: 12px; color: #cbd5e1; font-style: italic; line-height: 1.6;">
+                  «بیع مال موهوبه توسط واهب، رجوع ضمنی از هبه محسوب می‌شود. در هبه غیرمعوض، واهب حق رجوع دارد مگر موانع ماده ۸۰۳ ق.م؛ بیع کاشف از قصد واهب بر بازگشت مال به ملکیت خود بوده و عقد هبه انحلال یافته و بیع کاملاً صحیح است.»
+                </p>
+              </div>
+
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <button style="background: #ef4444; color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-size: 11px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                  ⏹️ پایان ضبط و تحلیل با هوش مصنوعی
+                </button>
+                <span style="font-size: 11px; color: #94a3b8; font-family: monospace;">زمان ضبط: ۰۰:۳۸</span>
+              </div>
+            </div>
+
+            <!-- AI Scoring Result -->
+            <div class="card" style="background: linear-gradient(135deg, #0f172a, #1e1b4b); border: 1px solid #4338ca; text-align: center;">
+              <span style="font-size: 11px; color: #fbbf24; font-weight: 800; display: block; margin-bottom: 6px;">نمره ارزیابی هوش مصنوعی</span>
+              <div style="font-size: 3rem; font-weight: 900; font-family: monospace; color: #fff; line-height: 1;">
+                ۱۹ <span style="font-size: 14px; color: #94a3b8;">از ۲۰</span>
+              </div>
+              <span class="badge-pill bg-green-soft" style="margin: 10px 0;">قبول مقتدرانه اختبار علمی ✓</span>
+
+              <div style="text-align: right; font-size: 11px; space-y: 6px; margin-top: 10px; border-top: 1px solid #334155; padding-top: 10px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                  <span style="color: #94a3b8;">سلاست کلام و اعتمادبه‌نفس:</span>
+                  <strong style="color: #34d399;">۹۵٪</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                  <span style="color: #94a3b8;">استناد صریح به مواد قانون:</span>
+                  <strong style="color: #34d399;">۹۰٪ (ماده ۸۰۳)</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">صحت استدلال دکترین:</span>
+                  <strong style="color: #34d399;">۱۰۰٪ (رجوع ضمنی)</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: SCREEN 4 - TRAPS -->
+    <section id="screen-traps" class="section-view">
+      <div class="mockup-frame">
+        <div class="browser-bar">
+          <div class="window-dots">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="address-bar">https://app.chatredanesh.ir/test-traps-atlas</div>
+          <span style="font-size: 11px; color: #94a3b8;">اطلس تله‌های تستی آزمون وکالت</span>
+        </div>
+
+        <div class="screen-content">
+          <div class="grid-3">
+            
+            <div class="card" style="border-top: 4px solid #ef4444;">
+              <span class="badge-pill bg-red-soft" style="margin-bottom: 8px;">تله خطرناک: درجه ۱</span>
+              <h4 style="font-size: 13px; font-weight: 800; color: #fff; margin-bottom: 6px;">خیار شرط بدون ذکر مدت</h4>
+              <p style="font-size: 11px; color: #cbd5e1; margin-bottom: 10px;">
+                <strong>اشتباه رایج داوطلب:</strong> تصور اینکه فقط شرط باطل است و عقد صحیح است.
+              </p>
+              <div style="background: #0f172a; padding: 10px; border-radius: 10px; font-size: 11px; color: #34d399;">
+                <strong>پاسخ صحیح قانونی:</strong> طبق ماده ۴۰۱ ق.م هم عقد و هم شرط باطل است به دلیل سرایت غرر.
+              </div>
+            </div>
+
+            <div class="card" style="border-top: 4px solid #f59e0b;">
+              <span class="badge-pill bg-amber-soft" style="margin-bottom: 8px;">تله خطرناک: درجه ۲</span>
+              <h4 style="font-size: 13px; font-weight: 800; color: #fff; margin-bottom: 6px;">صلاحیت در خسارت مال غیرمنقول</h4>
+              <p style="font-size: 11px; color: #cbd5e1; margin-bottom: 10px;">
+                <strong>اشتباه رایج داوطلب:</strong> چون خسارت پول است، طرح دعوا در اقامتگاه خوانده (ماده ۱۱).
+              </p>
+              <div style="background: #0f172a; padding: 10px; border-radius: 10px; font-size: 11px; color: #34d399;">
+                <strong>پاسخ صحیح قانونی:</strong> طبق ماده ۱۲ ق.آ.د.م منحصراً دادگاه محل وقوع مال غیرمنقول صالح است.
+              </div>
+            </div>
+
+            <div class="card" style="border-top: 4px solid #3b82f6;">
+              <span class="badge-pill bg-blue-soft" style="margin-bottom: 8px;">تله خطرناک: درجه ۳</span>
+              <h4 style="font-size: 13px; font-weight: 800; color: #fff; margin-bottom: 6px;">استرداد دادخواست پس از جلسه اول</h4>
+              <p style="font-size: 11px; color: #cbd5e1; margin-bottom: 10px;">
+                <strong>اشتباه رایج داوطلب:</strong> صدور قرار ابطال دادخواست در تمامی مراحل استرداد.
+              </p>
+              <div style="background: #0f172a; padding: 10px; border-radius: 10px; font-size: 11px; color: #34d399;">
+                <strong>پاسخ صحیح قانونی:</strong> بعد از جلسه اول طبق بند ب ماده ۱۰۷ ق.آ.د.م «قرار رد دعوا» صادر می‌شود.
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 6: SCREEN 5 - BOT UI -->
+    <section id="screen-bot" class="section-view">
+      <div class="mockup-frame" style="max-width: 800px; margin: 0 auto;">
+        <div class="browser-bar">
+          <div class="window-dots">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="address-bar">bale://bot/chatredanesh_law_bot</div>
+          <span style="font-size: 11px; color: #94a3b8;">محیط چت ربات بله و تلگرام</span>
+        </div>
+
+        <div class="screen-content" style="background: #0b1120; min-height: 480px; display: flex; flex-direction: column; justify-content: space-between;">
+          <div style="display: flex; flex-direction: column;">
+            
+            <!-- Bot Message -->
+            <div class="chat-bubble chat-bot">
+              <span style="color: #fbbf24; font-weight: 800; display: block; margin-bottom: 4px;">⚖️ تست روزانه آزمون وکالت — چتر دانش</span>
+              <p style="margin-bottom: 6px;">
+                <strong>درس حقوق مدنی (سال ۱۴۰۳):</strong><br>
+                «در بیع فضولی، در صورت تنفیذ بعدی مالک اصلی، منافع منفصله مبیع در فاصله بین عقد و تنفیذ متعلق به چه کسی است؟»
+              </p>
+              <ol style="margin-right: 18px; font-size: 11.5px; margin-bottom: 8px;">
+                <li>مالک اصلی (نظریه نقل)</li>
+                <li>مشتری و اصیل (نظریه کشف حقیقی) ✓</li>
+                <li>بین مالک و مشتری بالمناصفه تقسیم می‌شود.</li>
+                <li>عقد باطل بوده و منفعتی تعلق نمی‌گیرد.</li>
+              </ol>
+            </div>
+
+            <!-- User Response -->
+            <div class="chat-bubble chat-user">
+              گزینه ۲ (نظریه کشف حقیقی - مشتری)
+            </div>
+
+            <!-- Bot Instant Feedback -->
+            <div class="chat-bubble chat-bot" style="border-left: 3px solid #10b981;">
+              <span style="color: #34d399; font-weight: 800; display: block; margin-bottom: 4px;">✅ پاسخ شما ۱۰۰٪ صحیح است!</span>
+              <p style="font-size: 11.5px; color: #cbd5e1; margin-bottom: 6px;">
+                📖 <strong>مستند ماده قانونی:</strong> ماده ۲۵۸ قانون مدنی<br>
+                💡 <strong>تحلیل تشریحی:</strong> بر اساس قاعده کشف حقیقی، اجازه مالک کاشف از صحت معامله از روز انعقاد عقد است و کلیه منافع منفصله از حین عقد به مشتری تعلق دارد.
+              </p>
+              <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;">
+                <span style="background: #1e3a8a; padding: 4px 10px; border-radius: 6px; font-size: 10px;">➡️ سوال بعدی وکالت</span>
+                <span style="background: #065f46; padding: 4px 10px; border-radius: 6px; font-size: 10px;">📊 کارنامه قانون تسهیل من</span>
+                <span style="background: #7c2d12; padding: 4px 10px; border-radius: 6px; font-size: 10px;">🌐 ورود ۱-کلیکی به وب‌سایت</span>
+              </div>
+            </div>
+
+          </div>
+
+          <div style="background: #1e293b; padding: 10px 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 12px; color: #94a3b8;">پاسخ خود را انتخاب یا تایپ کنید...</span>
+            <span style="font-size: 16px;">🎤 📎 🚀</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 7: SCREEN 6 - CRM & REFERRALS -->
+    <section id="screen-crm" class="section-view">
+      <div class="mockup-frame">
+        <div class="browser-bar">
+          <div class="window-dots">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="address-bar">https://app.chatredanesh.ir/admin/payouts-referrers</div>
+          <span style="font-size: 11px; color: #94a3b8;">داشبورد معرف‌ها، رتبه‌های برتر و تسویه شبا</span>
+        </div>
+
+        <div class="screen-content">
+          <div class="grid-3" style="margin-bottom: 1.5rem;">
+            <div class="card">
+              <span style="font-size: 11px; color: var(--text-muted); display: block;">کل داوطلبان ثبت‌نامی معرف‌ها</span>
+              <div class="stat-num" style="color: #60a5fa;">۱,۲۴۰ <span style="font-size: 12px;">نفر</span></div>
+              <span style="font-size: 10px; color: #94a3b8;">از طریق شبکه وکلای همکار</span>
+            </div>
+            <div class="card">
+              <span style="font-size: 11px; color: var(--text-muted); display: block;">مجموع پورسانت واریزی (تومان)</span>
+              <div class="stat-num" style="color: #34d399;">۲۴۸,۰۰۰,۰۰۰</div>
+              <span class="badge-pill bg-green-soft" style="margin-top: 4px;">تسویه شده از طریق پایا/ساتنا</span>
+            </div>
+            <div class="card">
+              <span style="font-size: 11px; color: var(--text-muted); display: block;">درخواست‌های معوق تسویه</span>
+              <div class="stat-num" style="color: #fbbf24;">۳ <span style="font-size: 12px;">درخواست</span></div>
+              <span class="badge-pill bg-amber-soft" style="margin-top: 4px;">آماده تایید حسابداری</span>
+            </div>
+          </div>
+
+          <!-- Table of Referrers -->
+          <div class="card">
+            <h4 style="font-size: 13px; font-weight: 800; color: #fff; margin-bottom: 12px;">
+              📋 لیست رتبه‌های برتر و وکلای فعال در شبکه معرف‌های چتر دانش
+            </h4>
+            <table style="width: 100%; text-align: right; border-collapse: collapse; font-size: 12px;">
+              <thead>
+                <tr style="border-bottom: 1px solid #334155; color: #94a3b8;">
+                  <th style="padding: 10px;">نام وکیل / رتبه برتر</th>
+                  <th style="padding: 10px;">کد معرف اختصاصی</th>
+                  <th style="padding: 10px; text-align: center;">رتبه کانون</th>
+                  <th style="padding: 10px; text-align: center;">تعداد جذب</th>
+                  <th style="padding: 10px; text-align: center;">موجودی قابل تسویه</th>
+                  <th style="padding: 10px;">شماره شبا بانکی</th>
+                  <th style="padding: 10px; text-align: center;">عملیات</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid #1e293b;">
+                  <td style="padding: 10px; font-weight: 800; color: #fff;">دکتر حمیدرضا مهدوی</td>
+                  <td style="padding: 10px; font-family: monospace; color: #fbbf24;">MAHDAVI-100</td>
+                  <td style="padding: 10px; text-align: center; color: #34d399; font-weight: bold;">رتبه ۷ کانون مرکز</td>
+                  <td style="padding: 10px; text-align: center; font-weight: bold;">۴۵ نفر</td>
+                  <td style="padding: 10px; text-align: center; color: #34d399; font-weight: 900;">۹,۰۰۰,۰۰۰ ت</td>
+                  <td style="padding: 10px; font-family: monospace; font-size: 11px; color: #94a3b8;">IR820170000000123456789001</td>
+                  <td style="padding: 10px; text-align: center;">
+                    <button style="background: #10b981; color: #064e3b; border: none; padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 10px; cursor: pointer;">تایید و تسویه ✓</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 10px; font-weight: 800; color: #fff;">مریم کاظمی</td>
+                  <td style="padding: 10px; font-family: monospace; color: #fbbf24;">KAZEMI-TOP</td>
+                  <td style="padding: 10px; text-align: center; color: #34d399; font-weight: bold;">رتبه ۱۲ کانون فارس</td>
+                  <td style="padding: 10px; text-align: center; font-weight: bold;">۲۸ نفر</td>
+                  <td style="padding: 10px; text-align: center; color: #34d399; font-weight: 900;">۵,۶۰۰,۰۰۰ ت</td>
+                  <td style="padding: 10px; font-family: monospace; font-size: 11px; color: #94a3b8;">IR540120000000987654321002</td>
+                  <td style="padding: 10px; text-align: center;">
+                    <button style="background: #10b981; color: #064e3b; border: none; padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 10px; cursor: pointer;">تایید و تسویه ✓</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    function showTab(tabId) {
+      document.querySelectorAll('.section-view').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      
+      const target = document.getElementById(tabId);
+      if (target) {
+        target.classList.add('active');
+      }
+      
+      const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
+      if (btn) {
+        btn.classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>

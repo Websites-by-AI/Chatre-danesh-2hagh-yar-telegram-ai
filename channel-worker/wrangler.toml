@@ -9,6 +9,6 @@ crons = ["30 6 * * *"]
 binding = "AI"
 
 [vars]
-CHANNEL_ID = "@ai_exam_iran"
-BALE_CHANNEL_ID = "@taranom_hamdeli_channel"
+CHANNEL_ID = "@ChatreDanesh_Law"
+BALE_CHANNEL_ID = "@ChatreDanesh_Law_Channel"
 EXAM_RAG_URL = "https://sosa123454321-taranom-exam-rag.static.hf.space"

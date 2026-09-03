@@ -1,6 +1,6 @@
 /**
  * Taranom Channel Poster — پست خودکار روزانه در دو کانال:
- *   تلگرام: @ai_exam_iran | بله: @taranom_hamdeli_channel (ble.ir/taranom_hamdeli_channel)
+ *   تلگرام: @ChatreDanesh_Law | بله: @ChatreDanesh_Law_Channel (ble.ir/taranom_hamdeli_channel)
  * ۱) سوال روز از بانک RAG (هاگینگ‌فیس)
  * ۲) نکته/ترند روز AI و آموزش — تولید با Workers AI (Llama-3.3-70B)
  */
@@ -30,8 +30,8 @@ async function questionOfDay(env, platform) {
   const item = bank[(doy * 37) % bank.length];
   const lines = item.o.map((o, i) => `${fa(i + 1)}) ${o}`).join("\n");
   const today = new Date().toLocaleDateString("fa-IR", { timeZone: "Asia/Tehran" });
-  const botLink = platform === "bale" ? "ble.ir/taranom_hamdeli_bot" : "@taranom_hamdeli_bot";
-  const btnUrl = platform === "bale" ? "https://ble.ir/taranom_hamdeli_bot" : "https://t.me/taranom_hamdeli_bot";
+  const botLink = platform === "bale" ? "ble.ir/ChatreDanesh_Law_Bot" : "@ChatreDanesh_Law_Bot";
+  const btnUrl = platform === "bale" ? "https://ble.ir/ChatreDanesh_Law_Bot" : "https://t.me/ChatreDanesh_Law_Bot";
   return {
     text: `🌅 سوال روز — ${today}\n📚 ${item.s} | کنکور ${fa(item.y)} (${item.f})\n━━━━━━━━━━━━━━━\n${item.q}\n\n${lines}\n━━━━━━━━━━━━━━━\n✍️ جوابت را در ربات بفرست و کارنامه بگیر:\n🤖 ${botLink} | 🌐 hamdeltar.ir`,
     reply_markup: { inline_keyboard: [[{ text: "📝 پاسخ در ربات + تست‌های بیشتر", url: btnUrl }]] },
@@ -70,7 +70,7 @@ async function aiTip(env) {
 
 function tipText(tip, platform) {
   const today = new Date().toLocaleDateString("fa-IR", { timeZone: "Asia/Tehran" });
-  const botLink = platform === "bale" ? "ble.ir/taranom_hamdeli_bot" : "@taranom_hamdeli_bot";
+  const botLink = platform === "bale" ? "ble.ir/ChatreDanesh_Law_Bot" : "@ChatreDanesh_Law_Bot";
   return `💡 نکته روز — ${today}\n━━━━━━━━━━━━━━━\n${tip}\n━━━━━━━━━━━━━━━\n🤖 مشاوره رایگان با هوش مصنوعی: ${botLink}\n🌐 hamdeltar.ir`;
 }
 
@@ -78,7 +78,7 @@ async function postDaily(env) {
   const results = { telegram: { question: null, tip: null }, bale: { question: null, tip: null } };
   const tip = await aiTip(env);
 
-  // ── تلگرام (@ai_exam_iran)
+  // ── تلگرام (@ChatreDanesh_Law)
   try {
     const q = await questionOfDay(env, "telegram");
     const r1 = await tg(env, "sendMessage", { chat_id: env.CHANNEL_ID, text: q.text, reply_markup: q.reply_markup });
@@ -91,7 +91,7 @@ async function postDaily(env) {
     } else results.telegram.tip = "ai empty";
   } catch (e) { results.telegram.tip = "err: " + e.message; }
 
-  // ── بله (@taranom_hamdeli_channel — ble.ir/taranom_hamdeli_channel)
+  // ── بله (@ChatreDanesh_Law_Channel — ble.ir/taranom_hamdeli_channel)
   if (env.BALE_BOT_TOKEN && env.BALE_CHANNEL_ID) {
     try {
       const qb = await questionOfDay(env, "bale");
@@ -129,6 +129,6 @@ export default {
       const member = await bale(env, "getChatMember", { chat_id: env.BALE_CHANNEL_ID, user_id: 298530966 }).catch((e) => ({ err: e.message }));
       return new Response(JSON.stringify({ me, chat, member }), { headers: { "Content-Type": "application/json" } });
     }
-    return new Response(JSON.stringify({ ok: true, service: "taranom-channel-poster", channels: ["telegram:@ai_exam_iran", "bale:@taranom_hamdeli_channel"], schedule: "daily 06:30 UTC (~10:00 Tehran)" }), { headers: { "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ ok: true, service: "taranom-channel-poster", channels: ["telegram:@ChatreDanesh_Law", "bale:@ChatreDanesh_Law_Channel"], schedule: "daily 06:30 UTC (~10:00 Tehran)" }), { headers: { "Content-Type": "application/json" } });
   },
 };

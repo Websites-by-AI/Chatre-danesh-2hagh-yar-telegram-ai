@@ -57,9 +57,9 @@ export interface Env {
   WANDB_API_KEY?: string;
   /** URL of the education exam-RAG static Space. */
   EXAM_RAG_URL?: string;
-  /** Telegram Bot Token for @taranom_hamdeli_bot */
+  /** Telegram Bot Token for @ChatreDanesh_Law_Bot */
   TELEGRAM_BOT_TOKEN?: string;
-  /** Bale Bot Token for @taranom_hamdeli_bot */
+  /** Bale Bot Token for @ChatreDanesh_Law_Bot */
   BALE_BOT_TOKEN?: string;
   /** Kavenegar API key for OTP SMS. */
   KAVENEGAR_API_KEY?: string;
@@ -71,7 +71,7 @@ export interface Env {
   PAYMENT_CARD_NUMBER?: string;
   /** نام صاحب کارت برای پرداخت کارت‌به‌کارت. */
   PAYMENT_CARD_NAME?: string;
-  /** Channel for daily posts, e.g. "@ai_exam_iran". */
+  /** Channel for daily posts, e.g. "@ChatreDanesh_Law". */
   CHANNEL_ID?: string;
   /** Local development only. Never set this to true in production. */
   DEV_AUTH_CODES?: string;
@@ -1887,7 +1887,7 @@ async function buildBotHistory(env: Env, platform: string, chatId: string | numb
   return lines.join("\n");
 }
 
-/* ── پست روزانه کانال (@ai_exam_iran): سوال روز + نکته — فقط ادمین ربات ── */
+/* ── پست روزانه کانال (@ChatreDanesh_Law): سوال روز + نکته — فقط ادمین ربات ── */
 function isBotAdmin(env: Env, chatId: string | number): boolean {
   const raw = (env as any).BOT_ADMIN_IDS || "";
   return String(raw).split(",").map((s: string) => s.trim()).filter(Boolean).includes(String(chatId));
@@ -1911,12 +1911,12 @@ async function buildChannelDailyPost(env: Env): Promise<{ text: string; reply_ma
     lines.join("\n"),
     "━━━━━━━━━━━━━━━",
     "✍️ جوابت را در ربات بفرست و کارنامه بگیر:",
-    "🤖 @taranom_hamdeli_bot",
+    "🤖 @ChatreDanesh_Law_Bot",
     "🌐 hamdeltar.ir",
   ].join("\n");
   return {
     text,
-    reply_markup: { inline_keyboard: [[{ text: "📝 پاسخ در ربات + تست‌های بیشتر", url: "https://t.me/taranom_hamdeli_bot" }]] },
+    reply_markup: { inline_keyboard: [[{ text: "📝 پاسخ در ربات + تست‌های بیشتر", url: "https://t.me/ChatreDanesh_Law_Bot" }]] },
   };
 }
 
@@ -2226,7 +2226,7 @@ async function botLoginRoute(ctx: Ctx, store: AuthStore): Promise<Response> {
   const fail = (msg: string) => new Response(
     `<!doctype html><html dir="rtl" lang="fa"><meta charset="utf-8"><body style="font-family:Tahoma;text-align:center;padding:60px 20px;background:#f8fafc">
      <h2>🔗 ${msg}</h2><p>از داخل ربات دوباره دکمه «🌐 ورود به سایت» را بزن تا لینک تازه بگیری.</p>
-     <a href="https://t.me/taranom_hamdeli_bot" style="color:#4f46e5">بازگشت به ربات تلگرام</a></body></html>`,
+     <a href="https://t.me/ChatreDanesh_Law_Bot" style="color:#4f46e5">بازگشت به ربات تلگرام</a></body></html>`,
     { status: 400, headers: { "Content-Type": "text/html; charset=utf-8" } });
   if (!t || !ctx.env.DB) return fail("لینک نامعتبر است");
   const row: any = await ctx.env.DB.prepare("SELECT * FROM bot_login_tokens WHERE token=?").bind(t).first();
@@ -2810,7 +2810,7 @@ async function buildBotStatus(env: Env, platform: "telegram" | "bale"): Promise<
   const channel = platform === "telegram" ? "ربات تلگرام" : "بازوی بله";
   return [
     "🟢 وضعیت زنده سامانه ترنم همدلی:",
-    `- ${channel}: فعال و متصل (@taranom_hamdeli_bot)`,
+    `- ${channel}: فعال و متصل (@ChatreDanesh_Law_Bot)`,
     `- کاربران ثبت‌شده: ${userCount} نفر`,
     `- بانک تست فعال ربات: ${bankCount} سوال واقعی کنکور`,
     `- موتور هوش مصنوعی: ${hasAi ? "آماده ✅" : "غیرفعال ⚠️"}`,
@@ -3160,7 +3160,7 @@ async function handleBotUpdate(
   const userLastName = message.from?.last_name || null;
 
   if (text === "/start") {
-    const home = platform === "telegram" ? "@taranom_hamdeli_bot" : "ble.ir/taranom_hamdeli_bot";
+    const home = platform === "telegram" ? "@ChatreDanesh_Law_Bot" : "ble.ir/ChatreDanesh_Law_Bot";
     const prof = await getBotProfile(ctx.env, platform, chatId);
     // 🧠 حافظه: اگر قبلاً ثبت‌نام کرده، دوباره نپرس — خوش‌آمد با پروفایل ذخیره‌شده
     if (prof && prof.step === "done") {
@@ -3263,7 +3263,7 @@ async function handleBotUpdate(
     }
     const post = await buildChannelDailyPost(ctx.env);
     if (!post) { await send("sendMessage", { chat_id: chatId, text: "بانک سوال در دسترس نیست." }); return json({ ok: true }); }
-    const channel = (ctx.env as any).CHANNEL_ID || "@ai_exam_iran";
+    const channel = (ctx.env as any).CHANNEL_ID || "@ChatreDanesh_Law";
     await send("sendMessage", { chat_id: channel, text: post.text, reply_markup: post.reply_markup });
     await send("sendMessage", { chat_id: chatId, text: `✅ سوال روز در کانال ${channel} منتشر شد.`, reply_markup: BOT_MENU_KEYBOARD });
     return json({ ok: true });
@@ -4611,7 +4611,7 @@ async function botAdminRoute(ctx: Ctx, store: AuthStore, method: string): Promis
 
   const tgToken = ctx.env.TELEGRAM_BOT_TOKEN || "";
   const baleToken = ctx.env.BALE_BOT_TOKEN || "";
-  const channel = ctx.env.CHANNEL_ID || "@ai_exam_iran";
+  const channel = ctx.env.CHANNEL_ID || "@ChatreDanesh_Law";
 
   if (method === "POST") {
     const body = await readJson(ctx.request);

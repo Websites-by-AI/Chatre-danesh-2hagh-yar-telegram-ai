@@ -4,7 +4,7 @@ Worker جداگانه Cloudflare (`taranom-channel-poster`) که هر روز س�
 
 | کانال | پیام‌رسان |
 |---|---|
-| `@ai_exam_iran` | تلگرام |
+| `@ChatreDanesh_Law` | تلگرام |
 | `@taranom_hamdeli_channel` (ble.ir/taranom_hamdeli_channel) | بله |
 
 ## محتوای هر روز
@@ -28,4 +28,4 @@ wrangler secret put RUN_KEY
 
 ## نکته
 ربات باید در هر دو کانال **ادمین با اجازه ارسال پیام** باشد.
-در بله: تنظیمات کانال ← مدیران ← افزودن `@taranom_hamdeli_bot`.
+در بله: تنظیمات کانال ← مدیران ← افزودن `@ChatreDanesh_Law_Bot`.

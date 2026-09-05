@@ -1,363 +1,394 @@
 import fs from 'fs';
 
-const TG_TOKEN = "8952421998:AAGD9p1PovfIj9TFrYoVOlQBNoauOpT03-I";
-const API_BASE = `https://api.telegram.org/bot${TG_TOKEN}`;
+const TELEGRAM_TOKEN = "7918804616:AAFb5R4-kLpU0gYxT_ZJp1lV8mQ4yG1nI_0";
+const API_BASE = `https://api.telegram.org/bot${TELEGRAM_TOKEN}`;
 
-// بارگذاری بانک تست‌های حقوقی
-const exams = JSON.parse(fs.readFileSync('/home/user/chatre-danesh-repo/huggingface-static/data/exams.json', 'utf-8'));
-
-// ایمن‌سازی متون حقوقی در برابر خطاهای Markdown تلگرام
-function safeMd(text = "") {
-  return String(text)
-    .replace(/[_*[\]()~`>#+\-=|{}.!\\]/g, '\\$&');
-}
-
-// منوی دائمی پایین چت (Persistent Keyboard)
+// منوی دائمی پایین صفحه (Reply Keyboard)
 const BOT_PERSISTENT_KEYBOARD = {
   keyboard: [
-    [{ text: "📝 تست آزمون وکالت" }, { text: "🤖 تست هوشمند RAG" }],
-    [{ text: "📊 کارنامه و تراز قانون تسهیل" }, { text: "🎯 تله‌های تستی مواد قانونی" }],
-    [{ text: "🌐 ورود به پرتال چتر دانش" }, { text: "☰ منوی کامل امکانات" }]
+    [{ text: "⚖️ آزمون وکالت و تست روزانه" }, { text: "📊 کارنامه و شبیه‌ساز تسهیل" }],
+    [{ text: "🪤 تله‌های تستی مواد قانون" }, { text: "💬 مشاوره حقوقی هوشمند" }],
+    [{ text: "🌐 ورود به پرتال چتر دانش" }, { text: "ℹ️ راهنما و پشتیبانی" }]
   ],
   resize_keyboard: true,
   is_persistent: true
 };
 
-// منوی شیشه‌ای پنجره‌ای تاشو (Inline Keyboard)
+// منوی پنجره‌ای شیشه‌ای (Inline Keyboard)
 const BOT_INLINE_WINDOWS_MENU = {
   inline_keyboard: [
     [
-      { text: "📝 تست آزمون وکالت (جدید)", callback_data: "law:quiz" },
-      { text: "🤖 تست هوشمند RAG مواد قانون", callback_data: "law:smart" }
+      { text: "📝 تست تصادفی وکالت", callback_data: "qz:all" },
+      { text: "📚 انتخاب درس", callback_data: "menu:lessons" }
     ],
     [
-      { text: "📜 حقوق مدنی و دادرسی", callback_data: "law:sub:civil" },
-      { text: "🛡️ حقوق جزا و کیفری", callback_data: "law:sub:criminal" }
+      { text: "🪤 تله‌های پرتکرار آزمون", callback_data: "menu:traps" },
+      { text: "📈 تحلیل ساختار آزمون", callback_data: "menu:structure" }
     ],
     [
-      { text: "💼 حقوق تجارت و اسناد", callback_data: "law:sub:trade" },
-      { text: "📖 اصول فقه و اساسی", callback_data: "law:sub:fiqh" }
+      { text: "⚖️ محاسبه تراز قانون تسهیل", callback_data: "menu:facilitate" },
+      { text: "💬 هوش مصنوعی حق‌یار", callback_data: "menu:chat" }
     ],
     [
-      { text: "🎯 اطلس تله‌های مواد قانونی", callback_data: "law:traps" },
-      { text: "📊 تراز قانون تسهیل من", callback_data: "law:facilitation" }
-    ],
-    [
-      { text: "🌐 ورود ۱-کلیکی به سایت چتر دانش", url: "https://chatredanesh-app.ir/dashboard" }
+      { text: "🌐 ورود مستقیم به سایت چتر دانش", callback_data: "menu:sitelogin" }
     ]
   ]
 };
 
-async function tgCall(method, payload) {
+// منوی دروس حقوقی
+const BOT_LESSONS_INLINE = {
+  inline_keyboard: [
+    [{ text: "📘 حقوق مدنی", callback_data: "qz:madani" }, { text: "📕 آیین دادرسی مدنی", callback_data: "qz:adm" }],
+    [{ text: "📗 حقوق تجارت", callback_data: "qz:tejarat" }, { text: "📙 حقوق جزا", callback_data: "qz:jaza" }],
+    [{ text: "📓 دادرسی کیفری", callback_data: "qz:adk" }, { text: "📔 اصول و متون فقه", callback_data: "qz:fegh" }],
+    [{ text: "📜 حقوق اساسی", callback_data: "qz:asasi" }],
+    [{ text: "🔙 بازگشت به منوی اصلی", callback_data: "menu:main" }]
+  ]
+};
+
+// منوی تحلیل تله‌های تستی
+const BOT_TRAPS_INLINE = {
+  inline_keyboard: [
+    [{ text: "⚠️ تله ماده ۴۰۱ (خیار شرط بدون مدت)", callback_data: "trap:401" }],
+    [{ text: "⚠️ تله ماده ۳۰۰ (اماره تصرف و تعارض)", callback_data: "trap:300" }],
+    [{ text: "⚠️ تله ماده ۱۰۷ (استرداد دادخواست و دعوا)", callback_data: "trap:107" }],
+    [{ text: "🔙 بازگشت به منوی اصلی", callback_data: "menu:main" }]
+  ]
+};
+
+// تابع ایمن‌سازی متون برای تلگرام (جلوگیری از خطای 400 Markdown)
+function safeMd(text) {
+  if (!text) return "";
+  return text.replace(/([_*[\]()~`>#+\-=|{}.!])/g, "\\$1");
+}
+
+// بارگذاری بانک ۱۰۵ تستی
+let examBank = [];
+try {
+  const raw = fs.readFileSync('/home/user/chatre-danesh-repo/huggingface-static/data/exams.json', 'utf-8');
+  examBank = JSON.parse(raw);
+  console.log(`[INIT] ${examBank.length} verified law exam questions loaded into active memory.`);
+} catch (e) {
+  console.error("[INIT] Failed to load exams.json", e.message);
+}
+
+// وضعیت آزمون جاری کاربران
+const userQuizSession = new Map();
+
+async function sendTelegram(method, payload) {
   try {
     const res = await fetch(`${API_BASE}/${method}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
     const data = await res.json();
     if (!data.ok) {
-      // اگر در فرمت Markdown خطا داد، فال‌بک به فرمت ساده متنی بدون استایل
       if (payload.parse_mode) {
         delete payload.parse_mode;
-        const retryRes = await fetch(`${API_BASE}/${method}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        return await retryRes.json();
+        return await sendTelegram(method, payload);
       }
+      console.warn(`[API] Telegram ${method} warning:`, data.description);
     }
     return data;
-  } catch (e) {
-    console.error(`Error calling ${method}:`, e.message);
-    return null;
+  } catch (err) {
+    console.error(`[ERR] Telegram fetch error:`, err.message);
   }
-}
-
-function toPersianNum(n) {
-  const f = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
-  return String(n).replace(/\d/g, d => f[+d]);
-}
-
-function getRandomQuestion(subject) {
-  let list = exams;
-  if (subject) {
-    list = exams.filter(e => e.subject.includes(subject));
-  }
-  return list[Math.floor(Math.random() * list.length)];
 }
 
 async function handleUpdate(update) {
-  // ۱. پردازش کلیک روی دکمه‌های شیشه‌ای (Callback Query)
-  if (update.callback_query) {
-    const cb = update.callback_query;
-    const chatId = cb.message.chat.id;
-    const data = cb.data || "";
-
-    await tgCall("answerCallbackQuery", { callback_query_id: cb.id });
-
-    if (data === "law:quiz" || data === "law:smart" || data.startsWith("law:sub:")) {
-      let subj = null;
-      if (data === "law:sub:civil") subj = "مدنی";
-      if (data === "law:sub:criminal") subj = "جزا";
-      if (data === "law:sub:trade") subj = "تجارت";
-      if (data === "law:sub:fiqh") subj = "فقه";
-
-      const q = getRandomQuestion(subj);
-      const qIdx = exams.indexOf(q);
-
-      const optionsText = q.options.map((o, i) => `${toPersianNum(i + 1)}) ${o}`).join("\n");
-      const text = `⚖️ **سوال آزمون وکالت — درس ${q.subject}**\n` +
-                   `📅 **منبع:** ${q.source || "آزمون سراسری وکالت"}\n` +
-                   `📌 **سرفصل:** ${q.tags?.lawName || "قوانین موضوعه"}\n` +
-                   `━━━━━━━━━━━━━━━━━━━\n` +
-                   `${q.question}\n\n` +
-                   `${optionsText}\n` +
-                   `━━━━━━━━━━━━━━━━━━━\n` +
-                   `✍️ گزینه مورد نظر خود را انتخاب کنید:`;
-
-      const keyboard = {
-        inline_keyboard: [
-          q.options.map((_, i) => ({
-            text: `${toPersianNum(i + 1)}`,
-            callback_data: `ans:${qIdx}:${i}`
-          })),
-          [{ text: "🔄 سوال بعدی", callback_data: "law:quiz" }]
-        ]
-      };
-
-      await tgCall("sendMessage", {
-        chat_id: chatId,
-        text,
-        reply_markup: keyboard,
-        parse_mode: "Markdown"
-      });
-      return;
-    }
-
-    if (data.startsWith("ans:")) {
-      const parts = data.split(":");
-      const qIdx = parseInt(parts[1]);
-      const chosenIdx = parseInt(parts[2]);
-      const q = exams[qIdx];
-
-      const isCorrect = (q.options[chosenIdx] === q.answer);
-      const verdict = isCorrect 
-        ? "✅ **آفرین! پاسخ شما کاملاً صحیح و منطبق بر قانون است.**" 
-        : "❌ **پاسخ نادرست — در تله تستی طراح آزمون افتادید!**";
-
-      const text = `${verdict}\n\n` +
-                   `🎯 **گزینه صحیح:** ${q.answer}\n` +
-                   `📖 **مستند ماده قانونی:** ${q.tags?.article || "قوانین مصوب"}\n\n` +
-                   `💡 **تحلیل تشریحی و رفع تله:**\n${q.explanation}\n\n` +
-                   `━━━━━━━━━━━━━━━━━━━\n` +
-                   `📊 نتیجه پاسخ شما در داشبورد تراز قانون تسهیل ثبت گردید.`;
-
-      await tgCall("sendMessage", {
-        chat_id: chatId,
-        text,
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: "➡️ سوال بعدی حقوقی", callback_data: "law:quiz" }],
-            [{ text: "🎯 تله‌های مشابه این مبحث", callback_data: "law:traps" }],
-            [{ text: "🌐 ورود به پرتال چتر دانش", url: "https://chatredanesh-app.ir/dashboard" }]
-          ]
-        },
-        parse_mode: "Markdown"
-      });
-      return;
-    }
-
-    if (data === "law:traps") {
-      const text = `🎯 **اطلس تله‌های تستی پرتکرار آزمون وکالت:**\n\n` +
-                   `۱. **ماده ۴۰۱ ق.م (خیار شرط بدون مدت):** بطلان همزمان عقد و شرط به دلیل سرایت غرر.\n` +
-                   `۲. **ماده ۳۰۰ ق.م (مالکیت مافی‌الذمه):** سقوط تعهد صرفاً به نسبت سهم‌الارث نه کل دین.\n` +
-                   `۳. **ماده ۱۲ ق.آ.د.م (خسارت غیرمنقول):** صلاحیت انحصاری دادگاه محل ملک.\n` +
-                   `۴. **ماده ۱۰۷ بند ب ق.آ.د.م:** استرداد پس از جلسه اول = قرار رد دعوا (نه ابطال دادخواست).\n` +
-                   `۵. **دادگاه‌های صلح جدید (۱۴۰۲):** صلاحیت انحصاری دعاوی مالی تا ۱۰۰ میلیون تومان.`;
-
-      await tgCall("sendMessage", {
-        chat_id: chatId,
-        text,
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: "📝 تست از تله‌های تستی", callback_data: "law:quiz" }]
-          ]
-        },
-        parse_mode: "Markdown"
-      });
-      return;
-    }
-
-    if (data === "law:facilitation") {
-      const text = `📊 **محاسبه‌گر تراز قانون تسهیل صدور مجوزهای کسب‌وکار:**\n\n` +
-                   `⚖️ **مبنای قبولی:** کسب حداقل ۷۰٪ میانگین نمرات تراز ۱٪ برتر آزمون (۶۰٪ برای ایثارگران).\n\n` +
-                   `📈 **تراز میانگین ۱٪ برتر:** حدود ۱۰,۲۰۰\n` +
-                   `🎯 **حدنصاب تراز قبولی عادی:** ۷,۱۴۰\n` +
-                   `🎯 **حدنصاب تراز ایثارگران:** ۶,۱۲۰\n\n` +
-                   `💡 برای مشاهده تراز دقیق و کارنامه ۶ درس خود وارد پرتال وب شوید.`;
-
-      await tgCall("sendMessage", {
-        chat_id: chatId,
-        text,
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: "🌐 مشاهده کارنامه کامل در سایت", url: "https://chatredanesh-app.ir/dashboard" }]
-          ]
-        },
-        parse_mode: "Markdown"
-      });
-      return;
-    }
-  }
-
-  // ۲. پردازش پیام‌های متنی و دستورات
-  if (update.message && update.message.text) {
+  // ۱. مدیریت پیام‌های متنی و دکمه‌های پایین صفحه
+  if (update.message) {
     const msg = update.message;
     const chatId = msg.chat.id;
-    const text = msg.text.trim();
-    const name = msg.from.first_name || "همراه گرامی";
+    const text = (msg.text || "").trim();
 
-    if (text === "/start") {
-      const welcomeText = `سلام ${name} عزیز! 🌸\n` +
-                          `به **ربات هوشمند سنجش و آزمون‌های وکالت موسسه آموزش عالی آزاد چتر دانش (حق‌یار)** خوش آمدید. ⚖️\n\n` +
-                          `🎯 **امکانات در دسترس شما:**\n` +
-                          `• 📝 حل تست‌های استاندارد سنوات گذشته با دکمه‌های شیشه‌ای\n` +
-                          `• 📖 پاسخ تشریحی مستند به مواد قانون مدنی، دادرسی و مجازات\n` +
-                          `• 📊 کارنامه آنلاین و محاسبه تراز قانون تسهیل\n` +
-                          `• 🎯 اطلس تله‌های تستی و اشتباهات رایج طراحان آزمون\n` +
-                          `• 🌐 ورود ۱-کلیکی به پرتال جامع چتر دانش\n\n` +
-                          `👇 یکی از گزینه‌های زیر را انتخاب کنید:`;
-
-      await tgCall("sendMessage", {
+    if (text === "/start" || text === "منوی اصلی" || text === "شروع مجدد") {
+      const welcome = `سلام و احترام به خانواده بزرگ حقوقی چتر دانش و حق‌یار ⚖️\n\nبه سامانه آزمون‌های وکالت، محاسبه‌گر قانون تسهیل و هوش مصنوعی حقوقی چتر دانش خوش آمدید.\n\nلطفاً یکی از خدمات زیر را انتخاب نمایید:`;
+      await sendTelegram("sendMessage", {
         chat_id: chatId,
-        text: welcomeText,
-        reply_markup: BOT_PERSISTENT_KEYBOARD,
-        parse_mode: "Markdown"
+        text: welcome,
+        reply_markup: BOT_INLINE_WINDOWS_MENU
       });
-
-      // ارسال منوی شیشه‌ای پنجره‌ای
-      await tgCall("sendMessage", {
+      await sendTelegram("sendMessage", {
         chat_id: chatId,
-        text: "☰ **منوی پنجره‌ای خدمات چتر دانش:**",
-        reply_markup: BOT_INLINE_WINDOWS_MENU,
-        parse_mode: "Markdown"
+        text: "💡 دسترسی سریع نیز از کیبورد پایین همیشه در دسترس شماست:",
+        reply_markup: BOT_PERSISTENT_KEYBOARD
       });
       return;
     }
 
-    if (text === "/quiz" || text === "📝 تست آزمون وکالت" || text === "🤖 تست هوشمند RAG") {
-      const q = getRandomQuestion();
-      const qIdx = exams.indexOf(q);
-
-      const optionsText = q.options.map((o, i) => `${toPersianNum(i + 1)}) ${o}`).join("\n");
-      const quizText = `⚖️ **سوال آزمون وکالت — درس ${q.subject}**\n` +
-                       `📅 **منبع:** ${q.source || "آزمون سراسری وکالت"}\n` +
-                       `📌 **سرفصل:** ${q.tags?.lawName || "قوانین موضوعه"}\n` +
-                       `━━━━━━━━━━━━━━━━━━━\n` +
-                       `${q.question}\n\n` +
-                       `${optionsText}\n` +
-                       `━━━━━━━━━━━━━━━━━━━\n` +
-                       `✍️ گزینه مورد نظر خود را انتخاب کنید:`;
-
-      const keyboard = {
-        inline_keyboard: [
-          q.options.map((_, i) => ({
-            text: `${toPersianNum(i + 1)}`,
-            callback_data: `ans:${qIdx}:${i}`
-          })),
-          [{ text: "🔄 سوال بعدی", callback_data: "law:quiz" }]
-        ]
-      };
-
-      await tgCall("sendMessage", {
-        chat_id: chatId,
-        text: quizText,
-        reply_markup: keyboard,
-        parse_mode: "Markdown"
-      });
-      return;
+    if (text === "⚖️ آزمون وکالت و تست روزانه" || text === "/quiz") {
+      return await serveRandomQuestion(chatId, "all");
     }
 
-    if (text === "📊 کارنامه و تراز قانون تسهیل") {
-      await tgCall("sendMessage", {
+    if (text === "📊 کارنامه و شبیه‌ساز تسهیل" || text === "/facilitate") {
+      const resp = `📊 *شبیه‌ساز تراز و حدنصاب قبولی قانون تسهیل*\n\nطبق ماده ۵ قانون تسهیل صدور مجوزهای کسب‌وکار:\n• داوطلبان آزاد: کسب ۷۰٪ میانگین نمره تراز ۱٪ برتر\n• داوطلبان ایثارگر: کسب ۶۰٪ میانگین نمره تراز ۱٪ برتر\n\nبرای ارزیابی کارنامه و درصد دروس به پرتال مراجعه فرمایید:\n🔗 https://chattredanesh.ir/facilitate`;
+      return await sendTelegram("sendMessage", {
         chat_id: chatId,
-        text: `📊 **کارنامه و محاسبه تراز قانون تسهیل:**\n\nتراز هدف برای قبولی در کانون وکلای مرکز: **۷,۲۰۰**\nحدنصاب لازم طبق ۱٪ برتر: **۷,۱۴۰** (سهمیه آزاد) | **۶,۱۲۰** (سهمیه ایثارگران)\n\nجهت مشاهده تحلیل ۶ درس روی دکمه زیر بزنید:`,
+        text: resp,
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [[{ text: "📊 ورود به شبیه‌ساز تراز", callback_data: "menu:facilitate" }]]
+        }
+      });
+    }
+
+    if (text === "🪤 تله‌های تستی مواد قانون" || text === "/traps") {
+      return await sendTelegram("sendMessage", {
+        chat_id: chatId,
+        text: "🪤 *تحلیل و کالبدشکافی تله‌های پرتکرار آزمون وکالت:*\n\nیکی از تله‌های مهم زیر را برای مشاهده تحلیل انتخاب فرمایید:",
+        parse_mode: "Markdown",
+        reply_markup: BOT_TRAPS_INLINE
+      });
+    }
+
+    if (text === "💬 مشاوره حقوقی هوشمند" || text === "/smart" || text === "/chat") {
+      return await sendTelegram("sendMessage", {
+        chat_id: chatId,
+        text: "⚖️ *هوش مصنوعی حقوقی حق‌یار و چتر دانش*\n\nسوال حقوقی، ماده قانون یا مبحث مدنی/کیفری مورد نظر خود را بنویسید تا مستندات قانونی و رویه قضایی به همراه تست‌های مرتبط ارائه شود."
+      });
+    }
+
+    if (text === "🌐 ورود به پرتال چتر دانش" || text === "/site") {
+      const ssoToken = `sso_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      const loginUrl = `https://chattredanesh.ir/login?sso=${ssoToken}&uid=${chatId}`;
+      return await sendTelegram("sendMessage", {
+        chat_id: chatId,
+        text: `🔐 *لینک اختصاصی ورود ۱-کلیکی به پرتال چتر دانش*\n\nاین لینک تا ۱۵ دقیقه معتبر و صرفاً برای اکانت شماست:`,
+        parse_mode: "Markdown",
         reply_markup: {
           inline_keyboard: [
-            [{ text: "🌐 مشاهده کارنامه کامل در پرتال وب", url: "https://chatredanesh-app.ir/dashboard" }]
-          ]
-        },
-        parse_mode: "Markdown"
-      });
-      return;
-    }
-
-    if (text === "🎯 تله‌های تستی مواد قانونی") {
-      await tgCall("sendMessage", {
-        chat_id: chatId,
-        text: "🎯 اطلس تله‌های تستی مواد قانونی فعال شد. تله‌های خطرناک مواد ۴۰۱، ۳۰۰، ۱۰۷ و ۱۲ در حال حاضر آماده مرور هستند.",
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: "🔍 مشاهده جزئیات تله‌ها و مواد قانون", callback_data: "law:traps" }]
+            [{ text: "🚀 ورود مستقیم به پرتال وب", url: loginUrl }],
+            [{ text: "🔙 بازگشت به منوی اصلی", callback_data: "menu:main" }]
           ]
         }
       });
-      return;
     }
 
-    if (text === "🌐 ورود به پرتال چتر دانش") {
-      await tgCall("sendMessage", {
+    if (text === "ℹ️ راهنما و پشتیبانی" || text === "/help") {
+      return await sendTelegram("sendMessage", {
         chat_id: chatId,
-        text: `🌐 **پرتال آموزشی چتر دانش (حق‌یار):**\n\nبرای دسترسی به کارگاه آزمون شفاهی اختبار، شبیه‌سازهای جامع و داشبورد مانوا، روی لینک زیر کلیک کنید:`,
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: "🚀 ورود مستقیم به پرتال وب چتر دانش", url: "https://chatredanesh-app.ir/dashboard" }]
-          ]
-        },
-        parse_mode: "Markdown"
+        text: `ℹ️ *راهنمای جامع ربات چتر دانش*\n\n🔹 /quiz - شروع آزمون و تست تصادفی\n🔹 /traps - تحلیل تله‌های تستی آزمون وکالت\n🔹 /facilitate - محاسبه تراز و فرمول قانون تسهیل\n🔹 /smart - پرسش حقوقی از هوش مصنوعی\n🔹 /site - ورود ۱-کلیکی به وبسایت\n\nتلفن پشتیبانی مرکزی: ۰۲۱-۶۶۴۱۴۸۴۸\nوبسایت رسمی: https://chattredanesh.ir`
       });
-      return;
     }
 
-    if (text === "☰ منوی کامل امکانات" || text === "/menu") {
-      await tgCall("sendMessage", {
-        chat_id: chatId,
-        text: "☰ **منوی کامل امکانات و پنل‌های چتر دانش:**",
-        reply_markup: BOT_INLINE_WINDOWS_MENU,
-        parse_mode: "Markdown"
-      });
-      return;
+    // پاسخ هوشمند RAG حقوقی به سوالات متنی
+    const hits = examBank.filter(q => q.question.includes(text) || q.subject.includes(text) || (q.tags && q.tags.some(t => t.includes(text))));
+    if (hits.length > 0) {
+      const top = hits[0];
+      const reply = `📚 *تست مرتبط شناسایی‌شده در بانک وکالت:*\n\n[درس: ${top.subject} | تگ: ${top.tags?.join("، ") || "عمومی"}]\n\n❓ *سوال:* ${top.question}\n\n✅ *پاسخ صحیح:* ${top.answer}\n\n💡 برای آزمون بیشتر از دستور /quiz استفاده فرمایید.`;
+      return await sendTelegram("sendMessage", { chat_id: chatId, text: reply, parse_mode: "Markdown" });
     }
 
-    // پاسخ عمومی مشاور حقوقی
-    await tgCall("sendMessage", {
+    // پاسخ عمومی
+    return await sendTelegram("sendMessage", {
       chat_id: chatId,
-      text: `پیام شما دریافت شد: «${text}»\n\nبرای شروع آزمون یا تست‌زنی، از دکمه‌های زیر استفاده کنید:`,
-      reply_markup: BOT_PERSISTENT_KEYBOARD
+      text: `پیام شما دریافت شد. برای دسترسی به خدمات حقوقی از گزینه‌های زیر استفاده نمایید:`,
+      reply_markup: BOT_INLINE_WINDOWS_MENU
     });
   }
-}
 
-// حلقه پردازش Long-Polling
-let offset = 0;
-async function pollUpdates() {
-  try {
-    const res = await fetch(`${API_BASE}/getUpdates?offset=${offset}&timeout=20`);
-    const data = await res.json();
-    if (data.ok && data.result && data.result.length > 0) {
-      for (const update of data.result) {
-        offset = update.update_id + 1;
-        console.log(`📩 پردازش آپدیت #${update.update_id} از کاربر ${update.message?.from?.first_name || update.callback_query?.from?.first_name}`);
-        await handleUpdate(update);
-      }
+  // ۲. مدیریت کلیک روی دکمه‌های شیشه‌ای (Callback Queries)
+  if (update.callback_query) {
+    const cb = update.callback_query;
+    const chatId = cb.message.chat.id;
+    const data = cb.data;
+
+    await sendTelegram("answerCallbackQuery", { callback_query_id: cb.id });
+
+    if (data === "menu:main") {
+      return await sendTelegram("sendMessage", {
+        chat_id: chatId,
+        text: "⚖️ منوی اصلی سامانه چتر دانش:",
+        reply_markup: BOT_INLINE_WINDOWS_MENU
+      });
     }
-  } catch (err) {
-    console.error("Polling error:", err.message);
+
+    if (data === "menu:lessons") {
+      return await sendTelegram("sendMessage", {
+        chat_id: chatId,
+        text: "📚 *لطفاً درس مورد نظر خود را برای آزمون انتخاب فرمایید:*",
+        parse_mode: "Markdown",
+        reply_markup: BOT_LESSONS_INLINE
+      });
+    }
+
+    if (data === "menu:traps") {
+      return await sendTelegram("sendMessage", {
+        chat_id: chatId,
+        text: "🪤 *تله‌های پرتکرار مواد قانون در آزمون وکالت:*",
+        parse_mode: "Markdown",
+        reply_markup: BOT_TRAPS_INLINE
+      });
+    }
+
+    if (data === "menu:structure") {
+      const trendText = `📈 *تحلیل ساختار و بودجه‌بندی آزمون وکالت:*\n\n۱) حقوق مدنی (۲۰ تست): تمرکز ۵۰٪ روی عقود معین و تعهدات (مواد ۱۰، ۱۸۳ تا ۳۰۱، ۳۳۸ تا ۴۶۵)\n۲) آیین دادرسی مدنی (۲۰ تست): تمرکز ویژه بر صلاحیت، طرق فوق‌العاده اعتراض (واخواهی، فرجام، اعاده دادرسی) و اجرای احکام مدنی\n۳) حقوق تجارت (۲۰ تست): شرکت‌های سهامی (لایحه ۱۳۴۷) و اسناد تجاری برات و چک\n۴) حقوق جزا و دادرسی کیفری (۴۰ تست): مجازات‌ها، جرایم علیه اموال، صلاحیت مراجع کیفری و کشف جرم\n\nبرای دریافت کارنامه تحلیلی از دکمه زیر استفاده نمایید:`;
+      return await sendTelegram("sendMessage", {
+        chat_id: chatId,
+        text: trendText,
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: "📝 شروع آزمون این مباحث", callback_data: "qz:all" }],
+            [{ text: "🔙 بازگشت به منوی اصلی", callback_data: "menu:main" }]
+          ]
+        }
+      });
+    }
+
+    if (data === "menu:facilitate") {
+      const resp = `📊 *شبیه‌ساز تراز و حدنصاب قبولی قانون تسهیل*\n\nطبق ماده ۵ قانون تسهیل صدور مجوزهای کسب‌وکار:\n• داوطلبان آزاد: کسب ۷۰٪ میانگین نمره تراز ۱٪ برتر\n• داوطلبان ایثارگر: کسب ۶۰٪ میانگین نمره تراز ۱٪ برتر\n\nبرای ارزیابی کارنامه و درصد دروس به پرتال مراجعه فرمایید:\n🔗 https://chattredanesh.ir/facilitate`;
+      return await sendTelegram("sendMessage", {
+        chat_id: chatId,
+        text: resp,
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [[{ text: "🔙 منوی اصلی", callback_data: "menu:main" }]]
+        }
+      });
+    }
+
+    if (data.startsWith("trap:")) {
+      const trapId = data.replace("trap:", "");
+      let desc = "";
+      if (trapId === "401") {
+        desc = "⚠️ *تله ماده ۴۰۱ قانون مدنی:*\n\nاگر برای خیار شرط مدت معین نشده باشد، هم شرط باطل است و هم عقد باطل است.\n🔹 *دام طراح سوال:* طراح معمولاً می‌نویسد «فقط شرط باطل است» که اشتباه است و هر دو باطلند.";
+      } else if (trapId === "300") {
+        desc = "⚠️ *تله ماده ۳۰۰ قانون مدنی:*\n\nاگر در یک مال تصرفاتی باشد که با هم تعارض دارند، هیچ یک از متصرفین نمی‌تواند به اماره تصرف استناد کند و اصل بر عدم است.";
+      } else if (trapId === "107") {
+        desc = "⚠️ *تله ماده ۱۰۷ آیین دادرسی مدنی:*\n\nاسترداد دادخواست تا قبل از اولین جلسه -> قرار ابطال دادخواست\nاسترداد دعوا مادام که دادرسی تمام نشده -> قرار رد دعوا\nاسترداد دعوا پس از ختم مذاکرات -> سقوط دعوا (به شرط رضایت خوانده یا انصراف کلی).";
+      }
+      return await sendTelegram("sendMessage", {
+        chat_id: chatId,
+        text: desc,
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: "📝 تست مرتبط با این ماده", callback_data: `qz:trap_${trapId}` }],
+            [{ text: "🔙 بازگشت به لیست تله‌ها", callback_data: "menu:traps" }]
+          ]
+        }
+      });
+    }
+
+    if (data.startsWith("qz:")) {
+      const subj = data.replace("qz:", "");
+      return await serveRandomQuestion(chatId, subj);
+    }
+
+    if (data.startsWith("ans:")) {
+      const [, qIdStr, optIdxStr] = data.split(":");
+      const qId = parseInt(qIdStr, 10);
+      const selectedOptIdx = parseInt(optIdxStr, 10);
+      const session = userQuizSession.get(chatId);
+
+      if (!session || session.qId !== qId) {
+        return await sendTelegram("sendMessage", {
+          chat_id: chatId,
+          text: "⚠️ این سوال قبلاً پاسخ داده شده یا منقضی شده است. برای تست جدید روی دکمه زیر بزنید:",
+          reply_markup: {
+            inline_keyboard: [[{ text: "📝 تست جدید", callback_data: "qz:all" }]]
+          }
+        });
+      }
+
+      userQuizSession.delete(chatId);
+      const item = session.item;
+      const isCorrect = item.options[selectedOptIdx] === item.answer;
+
+      let resultMsg = "";
+      if (isCorrect) {
+        resultMsg = `🎉 *آفرین! پاسخ شما کاملاً صحیح است.*\n\n✅ گزینه انتخابی: ${item.answer}\n\n📚 *مستند و درس:* ${item.subject}\n🏷️ *تگ‌ها:* ${item.tags?.join("، ") || "وکالت"}`;
+      } else {
+        resultMsg = `❌ *پاسخ نادرست بود.*\n\nگزینه شما: ${item.options[selectedOptIdx]}\n✅ *پاسخ صحیح:* ${item.answer}\n\n📚 *درس:* ${item.subject}\n🏷️ *تگ‌ها:* ${item.tags?.join("، ") || "وکالت"}`;
+      }
+
+      return await sendTelegram("sendMessage", {
+        chat_id: chatId,
+        text: resultMsg,
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: "🔄 تست بعدی", callback_data: `qz:${session.subj || "all"}` }],
+            [{ text: "📊 بازگشت به منوی اصلی", callback_data: "menu:main" }]
+          ]
+        }
+      });
+    }
+
+    if (data === "menu:sitelogin") {
+      const ssoToken = `sso_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      const loginUrl = `https://chattredanesh.ir/login?sso=${ssoToken}&uid=${chatId}`;
+      return await sendTelegram("sendMessage", {
+        chat_id: chatId,
+        text: `🔐 برای ورود مستقیم به پنل کاربری کلیک کنید:`,
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: "🚀 ورود به سایت چتر دانش", url: loginUrl }],
+            [{ text: "🔙 بازگشت", callback_data: "menu:main" }]
+          ]
+        }
+      });
+    }
   }
-  setTimeout(pollUpdates, 1500);
 }
 
-// شروع سرویس
-pollUpdates();
+async function serveRandomQuestion(chatId, subj = "all") {
+  let pool = examBank;
+  if (subj === "madani") pool = examBank.filter(q => q.subject.includes("مدنی") && !q.subject.includes("دادرسی"));
+  else if (subj === "adm") pool = examBank.filter(q => q.subject.includes("دادرسی مدنی"));
+  else if (subj === "tejarat") pool = examBank.filter(q => q.subject.includes("تجارت"));
+  else if (subj === "jaza") pool = examBank.filter(q => q.subject.includes("جزا"));
+  else if (subj === "adk") pool = examBank.filter(q => q.subject.includes("کیفری"));
+  else if (subj === "fegh") pool = examBank.filter(q => q.subject.includes("فقه"));
+  else if (subj === "asasi") pool = examBank.filter(q => q.subject.includes("اساسی"));
+  
+  if (pool.length === 0) pool = examBank;
+  const randIdx = Math.floor(Math.random() * pool.length);
+  const q = pool[randIdx];
+
+  const qId = Date.now();
+  userQuizSession.set(chatId, { qId, item: q, subj });
+
+  const text = `📝 *آزمون وکالت [درس: ${q.subject}]*\n\n❓ *سوال:*\n${q.question}\n\n👇 لطفاً پاسخ صحیح را انتخاب فرمایید:`;
+
+  const inlineKeyboard = q.options.map((opt, optIdx) => [
+    { text: `🔹 ${opt}`, callback_data: `ans:${qId}:${optIdx}` }
+  ]);
+
+  inlineKeyboard.push([{ text: "🔙 انصراف و بازگشت", callback_data: "menu:main" }]);
+
+  await sendTelegram("sendMessage", {
+    chat_id: chatId,
+    text,
+    parse_mode: "Markdown",
+    reply_markup: { inline_keyboard: inlineKeyboard }
+  });
+}
+
+let lastUpdateId = 0;
+async function startLongPolling() {
+  console.log("===================================================================");
+  console.log("🤖 موتور پاسخ‌دهی زنده ربات تلگرام چتر دانش فعال شد (@ChatreDanesh_Law_Bot)");
+  console.log("===================================================================");
+
+  while (true) {
+    try {
+      const res = await fetch(`${API_BASE}/getUpdates?offset=${lastUpdateId + 1}&timeout=20`);
+      const data = await res.json();
+      if (data.ok && Array.isArray(data.result)) {
+        for (const u of data.result) {
+          lastUpdateId = u.update_id;
+          await handleUpdate(u);
+        }
+      }
+    } catch (err) {
+      // Sleep slightly on error to prevent CPU thrashing
+      await new Promise(r => setTimeout(r, 2000));
+    }
+  }
+}
+
+startLongPolling();

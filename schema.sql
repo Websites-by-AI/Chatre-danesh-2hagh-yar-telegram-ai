@@ -307,3 +307,15 @@ CREATE TABLE IF NOT EXISTS law_payouts (
 
 CREATE INDEX IF NOT EXISTS idx_law_referrers_code ON law_referrers(referral_code);
 CREATE INDEX IF NOT EXISTS idx_law_payouts_status ON law_payouts(status);
+
+-- آرشیو صفحات دفترچه آزمون‌های رسمی وکالت و حقوق
+CREATE TABLE IF NOT EXISTS exam_pages_archive (
+  id TEXT PRIMARY KEY,
+  booklet_id TEXT NOT NULL,
+  page_number INTEGER NOT NULL,
+  exam_year TEXT NOT NULL,
+  exam_title TEXT NOT NULL,
+  full_text TEXT NOT NULL,
+  extracted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_exam_pages_lookup ON exam_pages_archive(booklet_id, page_number);

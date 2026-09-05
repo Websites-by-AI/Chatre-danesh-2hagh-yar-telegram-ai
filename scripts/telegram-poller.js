@@ -7,8 +7,8 @@ const API_BASE = `https://api.telegram.org/bot${TELEGRAM_TOKEN}`;
 const BOT_PERSISTENT_KEYBOARD = {
   keyboard: [
     [{ text: "⚖️ آزمون‌ها و تست‌های تخصصی" }, { text: "🎲 تولید زنده تست سناریویی" }],
-    [{ text: "🪤 تله‌های تستی مواد قانون" }, { text: "🎓 انتخاب آزمون (وکالت/قضاوت)" }],
-    [{ text: "🌐 ورود به پرتال چتر دانش" }, { text: "ℹ️ راهنما و پشتیبانی" }]
+    [{ text: "📊 کارنامه تحلیلی و روند پیشرفت" }, { text: "🎓 انتخاب آزمون (وکالت/قضاوت)" }],
+    [{ text: "🪤 تله‌های تستی مواد قانون" }, { text: "🌐 ورود به پرتال چتر دانش" }]
   ],
   resize_keyboard: true,
   is_persistent: true
@@ -22,8 +22,8 @@ const BOT_INLINE_WINDOWS_MENU = {
       { text: "🎲 تولید تست سناریویی (زنده)", callback_data: "menu:dynamic_q" }
     ],
     [
-      { text: "🪤 تله‌های پرتکرار", callback_data: "menu:traps" },
-      { text: "📈 تحلیل ساختار آزمون", callback_data: "menu:structure" }
+      { text: "📊 کارنامه و روند تسلط", callback_data: "menu:structure" },
+      { text: "🪤 تله‌های پرتکرار", callback_data: "menu:traps" }
     ],
     [
       { text: "📅 محاسبه مواعد دادرسی", callback_data: "menu:deadlines" },
@@ -31,7 +31,7 @@ const BOT_INLINE_WINDOWS_MENU = {
     ],
     [
       { text: "🎙️ مصاحبه شفاهی قضاوت", callback_data: "menu:oral" },
-      { text: "🎓 انتخاب آزمون حقوقی", callback_data: "menu:exams" }
+      { text: "🎓 انتخاب آزمون هدف", callback_data: "menu:exams" }
     ],
     [
       { text: "🌐 ورود مستقیم به سایت چتر دانش", callback_data: "menu:sitelogin" }
@@ -98,7 +98,7 @@ const DYNAMIC_SCENARIOS = [
     question: 'وضعیت قرارداد اجاره مهدی و سرنوشت آپارتمان پس از تحقق شرط فاسخ چگونه است؟',
     options: [
       'قرارداد اجاره از ابتدا باطل بوده و علی می‌تواند فوراً حکم تخلیه مهدی را بگیرد.',
-      'قرارداد اجاره تا پایان مدت ۲ سال معتبر باقی می‌ماند و رضا مالک منافع آن مدت است (مستند به ماده ۴۹۸ ق.م و عدم سرایت فسخ به عقود صحیح گذشته).',
+      'قرارداد اجاره تا پایان مدت ۲ سال معتبر باقی می‌ماند و رضا مالک منافع آن مدت است (مستند به ماده ۴۹۸ ق.م و عدم سرایت فسخ به عقود گذشته).',
       'قرارداد اجاره منفسخ می‌شود و مهدی باید اجرت‌المثل ایام تصرف را به علی بپردازد.',
       'قرارداد اجاره غیرنافذ بوده و منوط به تنفیذ علی است.'
     ],
@@ -313,6 +313,28 @@ async function handleUpdate(update) {
       return await serveDynamicScenarioQuestion(chatId);
     }
 
+    if (text === "📊 کارنامه تحلیلی و روند پیشرفت" || text === "/trend" || text === "/karname") {
+      const trendText = `📊 *تحلیل ساختار و بودجه‌بندی آزمون وکالت و کارنامه روند تسلط:*\n\n` +
+        `📘 **حقوق مدنی:** ۱۵ تست در بانک | میانگین تسلط: ۷۵٪ | مبحث کلیدی: عقود معین و تعهدات\n` +
+        `📕 **آیین دادرسی مدنی:** ۱۵ تست | میانگین تسلط: ۸۲٪ | مبحث کلیدی: صلاحیت دادگاه صلح و طرق اعتراض\n` +
+        `📗 **حقوق تجارت:** ۱۵ تست | میانگین تسلط: ۶۸٪ | مبحث کلیدی: شرکت‌های سهامی و چک صیادی\n` +
+        `📙 **حقوق جزا و دادرسی کیفری:** ۳۰ تست | میانگین تسلط: ۸۰٪ | مبحث کلیدی: درجات مجازات و تحقیقات مقدماتی\n` +
+        `📔 **متون فقه و اساسی:** ۳۰ تست | میانگین تسلط: ۷۲٪ | مبحث کلیدی: استصحاب، برائت و حقوق ملت\n\n` +
+        `🔗 جهت مشاهده کارنامه کامل و نمودار روند: https://chattredanesh.ir/karname\n` +
+        `⚖️ شبیه‌ساز تراز قانون تسهیل: https://chattredanesh.ir/facilitate`;
+      return await sendTelegram("sendMessage", {
+        chat_id: chatId,
+        text: trendText,
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: "🎲 تست سناریویی جدید", callback_data: "menu:dynamic_q" }],
+            [{ text: "🔙 بازگشت به منوی اصلی", callback_data: "menu:main" }]
+          ]
+        }
+      });
+    }
+
     if (text === "🎓 انتخاب آزمون (وکالت/قضاوت)" || text === "/exams") {
       return await sendTelegram("sendMessage", {
         chat_id: chatId,
@@ -354,7 +376,7 @@ async function handleUpdate(update) {
     if (text === "ℹ️ راهنما و پشتیبانی" || text === "/help") {
       return await sendTelegram("sendMessage", {
         chat_id: chatId,
-        text: `ℹ️ *راهنمای جامع ربات چتر دانش*\n\n🔹 /scenario - تولید زنده تست سناریویی و تله‌دار\n🔹 /exams - انتخاب آزمون (وکالت، قضاوت، سردفتری و ...)\n🔹 /quiz - شروع آزمون استاندارد\n🔹 /traps - تله‌های تستی آزمون\n🔹 /deadlines - محاسبه مواعد دادرسی\n🔹 /site - ورود ۱-کلیکی به وبسایت\n\nتلفن پشتیبانی مرکزی: ۰۲۱-۶۶۴۱۴۸۴۸\nوبسایت رسمی: https://chattredanesh.ir`
+        text: `ℹ️ *راهنمای جامع ربات چتر دانش*\n\n🔹 /scenario - تولید زنده تست سناریویی و تله‌دار\n🔹 /trend - مشاهده کارنامه و تحلیل روند\n🔹 /exams - انتخاب آزمون (وکالت، قضاوت و ...)\n🔹 /quiz - شروع آزمون استاندارد\n🔹 /traps - تله‌های تستی آزمون\n🔹 /deadlines - محاسبه مواعد دادرسی\n🔹 /site - ورود ۱-کلیکی به وبسایت\n\nتلفن پشتیبانی مرکزی: ۰۲۱-۶۶۴۱۴۸۴۸\nوبسایت رسمی: https://chattredanesh.ir`
       });
     }
 
@@ -433,6 +455,28 @@ async function handleUpdate(update) {
           inline_keyboard: [
             [{ text: "🔄 تست سناریویی بعدی", callback_data: "menu:dynamic_q" }],
             [{ text: "📊 منوی اصلی", callback_data: "menu:main" }]
+          ]
+        }
+      });
+    }
+
+    if (data === "menu:structure") {
+      const trendText = `📊 *تحلیل ساختار و بودجه‌بندی آزمون وکالت و کارنامه روند تسلط:*\n\n` +
+        `📘 **حقوق مدنی:** ۱۵ تست در بانک | میانگین تسلط: ۷۵٪ | مبحث کلیدی: عقود معین و تعهدات\n` +
+        `📕 **آیین دادرسی مدنی:** ۱۵ تست | میانگین تسلط: ۸۲٪ | مبحث کلیدی: صلاحیت دادگاه صلح و طرق اعتراض\n` +
+        `📗 **حقوق تجارت:** ۱۵ تست | میانگین تسلط: ۶۸٪ | مبحث کلیدی: شرکت‌های سهامی و چک صیادی\n` +
+        `📙 **حقوق جزا و دادرسی کیفری:** ۳۰ تست | میانگین تسلط: ۸۰٪ | مبحث کلیدی: درجات مجازات و تحقیقات مقدماتی\n` +
+        `📔 **متون فقه و اساسی:** ۳۰ تست | میانگین تسلط: ۷۲٪ | مبحث کلیدی: استصحاب، برائت و حقوق ملت\n\n` +
+        `🔗 جهت مشاهده کارنامه کامل و نمودار روند: https://chattredanesh.ir/karname\n` +
+        `⚖️ شبیه‌ساز تراز قانون تسهیل: https://chattredanesh.ir/facilitate`;
+      return await sendTelegram("sendMessage", {
+        chat_id: chatId,
+        text: trendText,
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: "🎲 تست سناریویی جدید", callback_data: "menu:dynamic_q" }],
+            [{ text: "🔙 بازگشت به منوی اصلی", callback_data: "menu:main" }]
           ]
         }
       });

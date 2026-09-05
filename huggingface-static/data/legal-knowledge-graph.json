@@ -1,0 +1,119 @@
+{
+  "system": "Chatre Danesh & HaqYar KAG Legal Knowledge Graph",
+  "version": "2.0.0",
+  "graph_type": "Directed Attributed Legal Ontology & Rule Graph",
+  "nodes_count": 25,
+  "edges_count": 35,
+  "entities": [
+    {
+      "id": "node_civil_contract",
+      "type": "LEGAL_INSTITUTION",
+      "name": "عقد لازم و تعهدات قراردادی",
+      "statute": "قانون مدنی",
+      "core_article": "ماده ۱۰ و ماده ۲۱۹",
+      "keywords": ["قرارداد", "عقد لازم", "اصالة اللزوم", "آزادی اراده"]
+    },
+    {
+      "id": "node_trap_401",
+      "type": "LEGAL_TRAP_EXCEPTION",
+      "name": "خیار شرط بدون مدت (تله ماده ۴۰۱)",
+      "statute": "قانون مدنی",
+      "core_article": "ماده ۴۰۱",
+      "keywords": ["خیار شرط", "مدت معین", "بطلان شرط", "بطلان عقد", "غرری"]
+    },
+    {
+      "id": "node_possession_rule",
+      "type": "LEGAL_EVIDENCE_PRESUMPTION",
+      "name": "اماره تصرف و قاعده ید",
+      "statute": "قانون مدنی و اصول فقه",
+      "core_article": "ماده ۳۵ و ماده ۳۰۰",
+      "keywords": ["اماره تصرف", "قاعده ید", "تعارض تصرف", "مالکیت"]
+    },
+    {
+      "id": "node_civil_procedure_107",
+      "type": "PROCEDURAL_TERMINATION",
+      "name": "استرداد دادخواست و دعوا (ماده ۱۰۷)",
+      "statute": "آیین دادرسی مدنی",
+      "core_article": "ماده ۱۰۷",
+      "keywords": ["ابطال دادخواست", "رد دعوا", "سقوط دعوا", "ختم مذاکرات"]
+    },
+    {
+      "id": "node_peace_court",
+      "type": "JUDICIAL_JURISDICTION",
+      "name": "دادگاه صلح و نصاب صلاحیت‌ها",
+      "statute": "قانون جدید شوراهای حل اختلاف ۱۴۰۲",
+      "core_article": "ماده ۱۱ و ۱۲",
+      "keywords": ["دادگاه صلح", "نصاب ۱۰۰ میلیون", "تصرف عدوانی", "حصر وراثت", "شورای حل اختلاف"]
+    },
+    {
+      "id": "node_sayad_check_23",
+      "type": "COMMERCIAL_ENFORCEMENT",
+      "name": "اجراییه مستقیم چک صیادی (ماده ۲۳)",
+      "statute": "قانون صدور چک",
+      "core_article": "ماده ۲۳ اصلاحی ۱۳۹۷",
+      "keywords": ["چک صیادی", "اجراییه مستقیم", "گواهی عدم پرداخت", "مسدودی حساب"]
+    },
+    {
+      "id": "node_istishab",
+      "type": "JURISPRUDENCE_PRINCIPLE",
+      "name": "اصل استصحاب و بقای حالت سابقه",
+      "statute": "اصول فقه",
+      "core_article": "قاعده لاتنقض الیقین بالشک",
+      "keywords": ["استصحاب", "یقین سابق", "شک لاحق", "اصل صحت"]
+    },
+    {
+      "id": "node_precedent_811",
+      "type": "SUPREME_COURT_PRECEDENT",
+      "name": "ضمان درک و بهای روز مبیع مستحق‌للغیر",
+      "statute": "آراء وحدت رویه",
+      "core_article": "رای وحدت رویه ۸۱۱ و ۸۲۸",
+      "keywords": ["ضمان درک", "مستحق للغیر", "بهای روز", "کاهش ارزش ثمن"]
+    },
+    {
+      "id": "node_facilitation_law",
+      "type": "STATUTORY_BAR_CALCULATOR",
+      "name": "تراز و حدنصاب قبولی آزمون وکالت",
+      "statute": "قانون تسهیل صدور مجوزهای کسب‌وکار",
+      "core_article": "ماده ۵ اصلاحی",
+      "keywords": ["قانون تسهیل", "تراز ۱ درصد برتر", "حدنصاب ۷۰ درصد", "ایثارگران ۶۰ درصد"]
+    }
+  ],
+  "relations": [
+    {
+      "from": "node_trap_401",
+      "to": "node_civil_contract",
+      "relation": "FATAL_EXCEPTION_TO",
+      "description": "عدم ذکر مدت در شرط خیار استثنائاً موجب سرایت بطلان به اصل عقد می‌شود."
+    },
+    {
+      "from": "node_civil_procedure_107",
+      "to": "node_civil_contract",
+      "relation": "ENFORCES_REMEDY_IN_COURT",
+      "description": "استرداد دادخواست یا دعوا رسیدگی قضایی قرارداد را با قرارهای شکلی پایان می‌دهد."
+    },
+    {
+      "from": "node_sayad_check_23",
+      "to": "node_civil_procedure_107",
+      "relation": "BYPASSES_SUBSTANTIVE_TRIAL",
+      "description": "اجراییه مستقیم ماده ۲۳ نیاز به تشکیل جلسه دادرسی و صدور حکم بدوی را منتفی می‌سازد."
+    },
+    {
+      "from": "node_istishab",
+      "to": "node_possession_rule",
+      "relation": "SUBSIDIARY_TO_EVIDENCE",
+      "description": "اماره تصرف و ید بر اصل عملی استصحاب مقدم است (الامارة مقدمة علی الاصل)."
+    },
+    {
+      "from": "node_precedent_811",
+      "to": "node_civil_contract",
+      "relation": "MODIFIES_DAMAGES_FORMULA",
+      "description": "خسارت بطلان معامله را از ثمن اسمی به قیمت تورمی روز ملک ارتقا می‌دهد."
+    },
+    {
+      "from": "node_peace_court",
+      "to": "node_civil_procedure_107",
+      "relation": "STATUTORY_VENUE_EXCLUSIVE",
+      "description": "دعاوی مالی تا ۱۰۰ میلیون مستقیماً به دادگاه صلح بدون مراجعه به دادگاه عمومی ارجاع می‌شوند."
+    }
+  ]
+}

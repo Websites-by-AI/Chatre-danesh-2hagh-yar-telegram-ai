@@ -7,7 +7,7 @@ const API_BASE = `https://api.telegram.org/bot${TELEGRAM_TOKEN}`;
 const BOT_PERSISTENT_KEYBOARD = {
   keyboard: [
     [{ text: "⚖️ آزمون وکالت و تست روزانه" }, { text: "📊 کارنامه و شبیه‌ساز تسهیل" }],
-    [{ text: "🪤 تله‌های تستی مواد قانون" }, { text: "💬 مشاوره حقوقی هوشمند" }],
+    [{ text: "🪤 تله‌های تستی مواد قانون" }, { text: "🧠 مشاوره با هوش مصنوعی KAG" }],
     [{ text: "🌐 ورود به پرتال چتر دانش" }, { text: "ℹ️ راهنما و پشتیبانی" }]
   ],
   resize_keyboard: true,
@@ -27,7 +27,7 @@ const BOT_INLINE_WINDOWS_MENU = {
     ],
     [
       { text: "⚖️ محاسبه تراز قانون تسهیل", callback_data: "menu:facilitate" },
-      { text: "💬 هوش مصنوعی حق‌یار", callback_data: "menu:chat" }
+      { text: "🧠 استنتاج حقوقی KAG (۲۰ کتاب)", callback_data: "menu:kag" }
     ],
     [
       { text: "🌐 ورود مستقیم به سایت چتر دانش", callback_data: "menu:sitelogin" }
@@ -56,20 +56,95 @@ const BOT_TRAPS_INLINE = {
   ]
 };
 
-// تابع ایمن‌سازی متون برای تلگرام (جلوگیری از خطای 400 Markdown)
-function safeMd(text) {
-  if (!text) return "";
-  return text.replace(/([_*[\]()~`>#+\-=|{}.!])/g, "\\$1");
+// بارگذاری بانک ۱۰۵ تستی و پایگاه KAG
+let examBank = [];
+let lawBooksCorpus = [];
+let kagGraph = null;
+
+try {
+  examBank = JSON.parse(fs.readFileSync('/home/user/chatre-danesh-repo/huggingface-static/data/exams.json', 'utf-8'));
+  lawBooksCorpus = JSON.parse(fs.readFileSync('/home/user/chatre-danesh-repo/huggingface-static/data/law-books-corpus.json', 'utf-8')).books || [];
+  kagGraph = JSON.parse(fs.readFileSync('/home/user/chatre-danesh-repo/huggingface-static/data/legal-knowledge-graph.json', 'utf-8'));
+  console.log(`[INIT] Loaded ${examBank.length} questions, ${lawBooksCorpus.length} law books, and KAG Knowledge Graph.`);
+} catch (e) {
+  console.error("[INIT] Failed to load databases:", e.message);
 }
 
-// بارگذاری بانک ۱۰۵ تستی
-let examBank = [];
-try {
-  const raw = fs.readFileSync('/home/user/chatre-danesh-repo/huggingface-static/data/exams.json', 'utf-8');
-  examBank = JSON.parse(raw);
-  console.log(`[INIT] ${examBank.length} verified law exam questions loaded into active memory.`);
-} catch (e) {
-  console.error("[INIT] Failed to load exams.json", e.message);
+// موتور استنتاج KAG بر روی ۲۰ کتاب و گراف دانش
+function executeKagReasoning(userText) {
+  const norm = (s) => (s || "").replace(/[يك]/g, c => c === 'ي' ? 'ی' : 'ک').replace(/[\u200c\u200f\s]+/g, ' ').trim().toLowerCase();
+  const qNorm = norm(userText);
+  const tokens = qNorm.split(/\s+/).filter(t => t.length >= 2);
+
+  const matchedEntities = [];
+  const matchedEntityIds = new Set();
+
+  if (kagGraph && kagGraph.entities) {
+    for (const ent of kagGraph.entities) {
+      if (ent.keywords.some(kw => qNorm.includes(norm(kw))) || qNorm.includes(norm(ent.name)) || qNorm.includes(norm(ent.core_article))) {
+        matchedEntities.push(ent);
+        matchedEntityIds.add(ent.id);
+      }
+    }
+  }
+
+  const inferredRelations = [];
+  if (kagGraph && kagGraph.relations) {
+    for (const rel of kagGraph.relations) {
+      if (matchedEntityIds.has(rel.from) || matchedEntityIds.has(rel.to)) {
+        inferredRelations.push(rel);
+      }
+    }
+  }
+
+  const matchedArticles = [];
+  for (const book of lawBooksCorpus) {
+    for (const art of (book.key_articles || [])) {
+      const artHay = norm(`${art.article} ${art.subject} ${art.text} ${art.doctrine} ${(art.exceptions || []).join(' ')}`);
+      let score = 0;
+      for (const t of tokens) {
+        if (artHay.includes(t)) score++;
+      }
+      if (score > 0) {
+        matchedArticles.push({ book: book.title, art, score });
+      }
+    }
+  }
+
+  matchedArticles.sort((a, b) => b.score - a.score);
+
+  let resp = `🧠 *پاسخ استنتاجی هوش مصنوعی حقوقی چتر دانش (مبتنی بر مدل KAG & RAG)*\n`;
+  resp += `────────────────────────────\n`;
+
+  if (matchedEntities.length > 0) {
+    resp += `📌 *نهادهای حقوقی تطبیق داده‌شده:*\n`;
+    matchedEntities.slice(0, 2).forEach(e => {
+      resp += `• ${e.name} (${e.statute} - ${e.core_article})\n`;
+    });
+    resp += `\n`;
+  }
+
+  if (inferredRelations.length > 0) {
+    resp += `🔗 *روابط استنتاجی و استثنائات قانونی:*\n`;
+    inferredRelations.slice(0, 2).forEach(r => {
+      resp += `• ${r.description}\n`;
+    });
+    resp += `\n`;
+  }
+
+  if (matchedArticles.length > 0) {
+    const top = matchedArticles[0];
+    resp += `📚 *مستند قانونی از کتاب «${top.book}»:*\n`;
+    resp += `⚖️ *${top.art.article} - ${top.art.subject}:*\n«${top.art.text}»\n\n`;
+    resp += `💡 *دکترین و نظر اساتید:* ${top.art.doctrine}\n`;
+    if (top.art.exceptions && top.art.exceptions.length > 0) {
+      resp += `⚠️ *استثنائات:* ${top.art.exceptions.join('، ')}\n`;
+    }
+  } else {
+    resp += `برای جستجوی دقیق‌تر می‌توانید شماره ماده قانون (مثلاً ماده ۴۰۱ ق.م، ماده ۱۰۷ ق.آ.د.م، ماده ۲۳ چک یا ماده ۱۱ صلح) را ارسال فرمایید.`;
+  }
+
+  return resp;
 }
 
 // وضعیت آزمون جاری کاربران
@@ -97,14 +172,13 @@ async function sendTelegram(method, payload) {
 }
 
 async function handleUpdate(update) {
-  // ۱. مدیریت پیام‌های متنی و دکمه‌های پایین صفحه
   if (update.message) {
     const msg = update.message;
     const chatId = msg.chat.id;
     const text = (msg.text || "").trim();
 
     if (text === "/start" || text === "منوی اصلی" || text === "شروع مجدد") {
-      const welcome = `سلام و احترام به خانواده بزرگ حقوقی چتر دانش و حق‌یار ⚖️\n\nبه سامانه آزمون‌های وکالت، محاسبه‌گر قانون تسهیل و هوش مصنوعی حقوقی چتر دانش خوش آمدید.\n\nلطفاً یکی از خدمات زیر را انتخاب نمایید:`;
+      const welcome = `سلام و احترام به جامعه حقوقی چتر دانش و حق‌یار ⚖️\n\nپایگاه هوش مصنوعی حقوقی با ۲۰ کتاب قانون مرجع ایران، گراف دانش KAG، شبیه‌ساز قانون تسهیل و بانک تست‌های وکالت آماده خدمت به شماست.\n\nلطفاً یکی از خدمات زیر را انتخاب نمایید:`;
       await sendTelegram("sendMessage", {
         chat_id: chatId,
         text: welcome,
@@ -112,7 +186,7 @@ async function handleUpdate(update) {
       });
       await sendTelegram("sendMessage", {
         chat_id: chatId,
-        text: "💡 دسترسی سریع نیز از کیبورد پایین همیشه در دسترس شماست:",
+        text: "💡 دسترسی سریع از کیبورد پایین صفحه نیز فعال است:",
         reply_markup: BOT_PERSISTENT_KEYBOARD
       });
       return;
@@ -143,10 +217,12 @@ async function handleUpdate(update) {
       });
     }
 
-    if (text === "💬 مشاوره حقوقی هوشمند" || text === "/smart" || text === "/chat") {
+    if (text === "🧠 مشاوره با هوش مصنوعی KAG" || text === "/smart" || text === "/chat" || text === "/kag") {
+      const kagInfo = `🧠 *سامانه استنتاج حقوقی KAG (مبتنی بر ۲۰ کتاب مرجع)*\n\nپایگاه هوش مصنوعی مسلط به:\n۱) قانون مدنی (۱۳۳۵ ماده)\n۲) آیین دادرسی مدنی (۵۲۹ ماده)\n۳) قانون مجازات اسلامی ۱۳۹۲\n۴) آیین دادرسی کیفری\n۵) قانون تجارت و اسناد برات و چک\n۶) قانون دادگاه‌های صلح ۱۴۰۲\n۷) چک صیادی و ثبت اسناد و ...\n\n💬 کافیست سوال حقوقی یا ماده قانون مدنظر خود را همینجا تایپ کنید.`;
       return await sendTelegram("sendMessage", {
         chat_id: chatId,
-        text: "⚖️ *هوش مصنوعی حقوقی حق‌یار و چتر دانش*\n\nسوال حقوقی، ماده قانون یا مبحث مدنی/کیفری مورد نظر خود را بنویسید تا مستندات قانونی و رویه قضایی به همراه تست‌های مرتبط ارائه شود."
+        text: kagInfo,
+        parse_mode: "Markdown"
       });
     }
 
@@ -169,27 +245,26 @@ async function handleUpdate(update) {
     if (text === "ℹ️ راهنما و پشتیبانی" || text === "/help") {
       return await sendTelegram("sendMessage", {
         chat_id: chatId,
-        text: `ℹ️ *راهنمای جامع ربات چتر دانش*\n\n🔹 /quiz - شروع آزمون و تست تصادفی\n🔹 /traps - تحلیل تله‌های تستی آزمون وکالت\n🔹 /facilitate - محاسبه تراز و فرمول قانون تسهیل\n🔹 /smart - پرسش حقوقی از هوش مصنوعی\n🔹 /site - ورود ۱-کلیکی به وبسایت\n\nتلفن پشتیبانی مرکزی: ۰۲۱-۶۶۴۱۴۸۴۸\nوبسایت رسمی: https://chattredanesh.ir`
+        text: `ℹ️ *راهنمای جامع ربات چتر دانش و مدل KAG*\n\n🔹 /quiz - شروع آزمون و تست تصادفی\n🔹 /traps - تحلیل تله‌های تستی آزمون وکالت\n🔹 /kag - مشاوره استنتاجی با ۲۰ کتاب قانون\n🔹 /facilitate - محاسبه تراز قانون تسهیل\n🔹 /site - ورود ۱-کلیکی به وبسایت\n\nتلفن پشتیبانی مرکزی: ۰۲۱-۶۶۴۱۴۸۴۸\nوبسایت رسمی: https://chattredanesh.ir`
       });
     }
 
-    // پاسخ هوشمند RAG حقوقی به سوالات متنی
-    const hits = examBank.filter(q => q.question.includes(text) || q.subject.includes(text) || (q.tags && q.tags.some(t => t.includes(text))));
-    if (hits.length > 0) {
-      const top = hits[0];
-      const reply = `📚 *تست مرتبط شناسایی‌شده در بانک وکالت:*\n\n[درس: ${top.subject} | تگ: ${top.tags?.join("، ") || "عمومی"}]\n\n❓ *سوال:* ${top.question}\n\n✅ *پاسخ صحیح:* ${top.answer}\n\n💡 برای آزمون بیشتر از دستور /quiz استفاده فرمایید.`;
-      return await sendTelegram("sendMessage", { chat_id: chatId, text: reply, parse_mode: "Markdown" });
-    }
-
-    // پاسخ عمومی
+    // استنتاج KAG بر روی متن پیام کاربر
+    const kagResponse = executeKagReasoning(text);
     return await sendTelegram("sendMessage", {
       chat_id: chatId,
-      text: `پیام شما دریافت شد. برای دسترسی به خدمات حقوقی از گزینه‌های زیر استفاده نمایید:`,
-      reply_markup: BOT_INLINE_WINDOWS_MENU
+      text: kagResponse,
+      parse_mode: "Markdown",
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: "📝 تست مرتبط با این موضوع", callback_data: "qz:all" }],
+          [{ text: "🔙 منوی اصلی", callback_data: "menu:main" }]
+        ]
+      }
     });
   }
 
-  // ۲. مدیریت کلیک روی دکمه‌های شیشه‌ای (Callback Queries)
+  // مدیریت دکمه‌های شیشه‌ای
   if (update.callback_query) {
     const cb = update.callback_query;
     const chatId = cb.message.chat.id;
@@ -202,6 +277,15 @@ async function handleUpdate(update) {
         chat_id: chatId,
         text: "⚖️ منوی اصلی سامانه چتر دانش:",
         reply_markup: BOT_INLINE_WINDOWS_MENU
+      });
+    }
+
+    if (data === "menu:kag") {
+      const kagInfo = `🧠 *سامانه استنتاج حقوقی KAG (مبتنی بر ۲۰ کتاب مرجع)*\n\nپایگاه هوش مصنوعی مسلط به:\n۱) قانون مدنی (۱۳۳۵ ماده)\n۲) آیین دادرسی مدنی (۵۲۹ ماده)\n۳) قانون مجازات اسلامی ۱۳۹۲\n۴) آیین دادرسی کیفری\n۵) قانون تجارت و اسناد برات و چک\n۶) قانون دادگاه‌های صلح ۱۴۰۲\n۷) چک صیادی و ثبت اسناد و ...\n\n💬 کافیست سوال حقوقی یا ماده قانون مدنظر خود را همینجا تایپ کنید.`;
+      return await sendTelegram("sendMessage", {
+        chat_id: chatId,
+        text: kagInfo,
+        parse_mode: "Markdown"
       });
     }
 
@@ -371,7 +455,7 @@ async function serveRandomQuestion(chatId, subj = "all") {
 let lastUpdateId = 0;
 async function startLongPolling() {
   console.log("===================================================================");
-  console.log("🤖 موتور پاسخ‌دهی زنده ربات تلگرام چتر دانش فعال شد (@ChatreDanesh_Law_Bot)");
+  console.log("🤖 موتور پاسخ‌دهی زنده ربات تلگرام چتر دانش با KAG فعال شد (@ChatreDanesh_Law_Bot)");
   console.log("===================================================================");
 
   while (true) {
@@ -385,7 +469,6 @@ async function startLongPolling() {
         }
       }
     } catch (err) {
-      // Sleep slightly on error to prevent CPU thrashing
       await new Promise(r => setTimeout(r, 2000));
     }
   }

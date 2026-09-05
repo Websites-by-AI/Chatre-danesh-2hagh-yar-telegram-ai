@@ -91,7 +91,7 @@ export function loadLegalKnowledgeGraph(): KagKnowledgeGraph | null {
 export function normalizeLegalText(str: string): string {
   if (!str) return '';
   const faDigits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
-  const arDigits = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+  const arDigits = ['٠','١','٢','٣','٤','٥','٦','٧','۸','۹'];
   let res = str;
   for (let i = 0; i < 10; i++) {
     res = res.replaceAll(faDigits[i], i.toString()).replaceAll(arDigits[i], i.toString());
@@ -224,7 +224,16 @@ export function validateContractCondition(conditionText: string) {
   let reasoning = '';
   let relatedArticle = '';
 
-  if (norm.includes('خیار شرط') && (!norm.includes('مدت') && !norm.includes('روز') && !norm.includes('ماه') && !norm.includes('سال'))) {
+  const isUntimedCondition = norm.includes('خیار شرط') && (
+    norm.includes('بدون مدت') ||
+    norm.includes('بدون تعیین مدت') ||
+    norm.includes('مجهول') ||
+    norm.includes('هر زمان بخواهد') ||
+    norm.includes('نامحدود') ||
+    (!norm.includes('روز') && !norm.includes('ماه') && !norm.includes('سال') && !norm.includes('هفته'))
+  );
+
+  if (isUntimedCondition) {
     status = 'VOID_AND_NULLIFYING';
     relatedArticle = 'ماده ۴۰۱ و ۲۳۳ قانون مدنی';
     reasoning = 'خیار شرط بدون تعیین مدت، هم شرط را باطل می‌کند و هم موجب بطلان اصل عقد بیع می‌گردد (تله جهالت و غرر).';

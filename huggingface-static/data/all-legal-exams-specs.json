@@ -1,0 +1,111 @@
+{
+  "system": "Chatre Danesh Multi-Exam Legal Engine",
+  "version": "3.0.0",
+  "exams": [
+    {
+      "id": "exam_bar_scoda",
+      "title": "آزمون وکالت کانون وکلای دادگستری (اسکودا)",
+      "organizer": "اتحادیه سراسری کانون‌های وکلای دادگستری ایران (اسکودا) و سنجش",
+      "law_basis": "قانون کیفیت اخذ پروانه وکالت و قانون تسهیل کسب‌وکار",
+      "courses": [
+        { "name": "حقوق مدنی", "coefficient": 3, "questions": 20 },
+        { "name": "آیین دادرسی مدنی", "coefficient": 3, "questions": 20 },
+        { "name": "حقوق تجارت", "coefficient": 2, "questions": 20 },
+        { "name": "حقوق جزا (عمومی و اختصاصی)", "coefficient": 2, "questions": 20 },
+        { "name": "آیین دادرسی کیفری", "coefficient": 2, "questions": 20 },
+        { "name": "اصول فقه و متون فقه", "coefficient": 1, "questions": 20 },
+        { "name": "حقوق اساسی", "coefficient": 1, "questions": 20 }
+      ],
+      "scoring_rule": "محاسبه تراز قانون تسهیل: ۷۰٪ میانگین ۱٪ برتر داوطلبان آزاد و ۶۰٪ ایثارگران"
+    },
+    {
+      "id": "exam_bar_judiciary_187",
+      "title": "آزمون مرکز وکلای قوه قضائیه (ماده ۱۸۷)",
+      "organizer": "مرکز وکلا، کارشناسان رسمی و مشاوران خانواده قوه قضائیه",
+      "law_basis": "ماده ۱۸۷ قانون برنامه سوم توسعه و قانون تسهیل",
+      "courses": [
+        { "name": "حقوق مدنی", "coefficient": 3, "questions": 20 },
+        { "name": "آیین دادرسی مدنی", "coefficient": 3, "questions": 20 },
+        { "name": "حقوق تجارت", "coefficient": 2, "questions": 20 },
+        { "name": "حقوق جزا", "coefficient": 2, "questions": 20 },
+        { "name": "آیین دادرسی کیفری", "coefficient": 2, "questions": 20 },
+        { "name": "حقوق ثبت", "coefficient": 2, "questions": 20 },
+        { "name": "متون فقه", "coefficient": 2, "questions": 20 },
+        { "name": "حقوق اساسی", "coefficient": 1, "questions": 20 }
+      ],
+      "scoring_rule": "تراز قانون تسهیل با شمول ویژه درس حقوق ثبت"
+    },
+    {
+      "id": "exam_judiciary_selection",
+      "title": "آزمون تصدی منصب قضا (قضاوت عمومی و اختصاصی)",
+      "organizer": "معاونت منابع انسانی و امور فرهنگی قوه قضائیه",
+      "law_basis": "قانون شرایط انتخاب قضات دادگستری",
+      "courses": [
+        { "name": "حقوق مدنی و تعهدات", "coefficient": 3, "questions": 25 },
+        { "name": "آیین دادرسی مدنی و اجرای احکام", "coefficient": 3, "questions": 25 },
+        { "name": "حقوق جزای عمومی و اختصاصی", "coefficient": 3, "questions": 25 },
+        { "name": "آیین دادرسی کیفری", "coefficient": 2, "questions": 20 },
+        { "name": "حقوق تجارت", "coefficient": 2, "questions": 20 },
+        { "name": "اصول فقه و قواعد فقه", "coefficient": 2, "questions": 25 },
+        { "name": "استعداد شغلی و هوش قضایی", "coefficient": 2, "questions": 20 }
+      ],
+      "scoring_rule": "آزمون کتبی تستی + آزمون تشریحی + مصاحبه علمی و روانشناسی تخصصی"
+    },
+    {
+      "id": "exam_sardaftari_notary",
+      "title": "آزمون سردفتری اسناد رسمی",
+      "organizer": "سازمان ثبت اسناد و املاک کشور و کانون سردفتران",
+      "law_basis": "ماده ۵ قانون دفاتر اسناد رسمی و کانون سردفتران و دفتریاران",
+      "courses": [
+        { "name": "حقوق ثبت (املاک، اسناد، دفاتر، کاداستر)", "coefficient": 3, "questions": 30 },
+        { "name": "حقوق مدنی (اموال، عقود، ارث و وصیت)", "coefficient": 3, "questions": 25 },
+        { "name": "حقوق تجارت (شرکت‌ها، اسناد و ورشکستگی)", "coefficient": 2, "questions": 20 },
+        { "name": "احکام و متون فقهی", "coefficient": 2, "questions": 20 },
+        { "name": "قوانین و آیین‌نامه‌های دفاتر اسناد رسمی", "coefficient": 3, "questions": 25 },
+        { "name": "ادبیات فارسی و نگارش حقوقی", "coefficient": 2, "questions": 15 },
+        { "name": "عربی تخصصی", "coefficient": 1, "questions": 15 }
+      ],
+      "scoring_rule": "پذیرش بر اساس حدنصاب قانون تسهیل صدور مجوزها بدون سقف ظرفیت عددی"
+    },
+    {
+      "id": "exam_official_experts",
+      "title": "آزمون کارشناسان رسمی دادگستری (رشته‌های حقوقی و ثبتی)",
+      "organizer": "شورای عالی کارشناسان رسمی و مرکز وکلا و کارشناسان قوه قضائیه",
+      "law_basis": "قانون کانون کارشناسان رسمی دادگستری مصوب ۱۳۸۱",
+      "courses": [
+        { "name": "امور ثبتی و ارزیابی املاک", "coefficient": 3, "questions": 30 },
+        { "name": "قوانین و مقررات کارشناسی رسمی", "coefficient": 3, "questions": 20 },
+        { "name": "اصول نقشه‌برداری و کاداستر", "coefficient": 2, "questions": 20 },
+        { "name": "تفسیر عکس‌های هوایی و تحدید حدود", "coefficient": 2, "questions": 20 }
+      ],
+      "scoring_rule": "حدنصاب قانون تسهیل + مصاحبه صلاحیت عمومی و تخصصی"
+    },
+    {
+      "id": "exam_family_counseling",
+      "title": "آزمون مشاوران خانواده قوه قضائیه",
+      "organizer": "مرکز امور مشاوران خانواده قوه قضائیه",
+      "law_basis": "قانون حمایت خانواده ۱۳۹۱ و آیین‌نامه اجرایی ماده ۱۶ و ۱۷",
+      "courses": [
+        { "name": "حقوق خانواده و مقررات نکاح و طلاق", "coefficient": 3, "questions": 25 },
+        { "name": "روانشناسی عمومی و شخصیت", "coefficient": 3, "questions": 25 },
+        { "name": "اصول و فنون مشاوره و مداخله در بحران", "coefficient": 3, "questions": 25 },
+        { "name": "فقه خانواده و احکام زوجیت", "coefficient": 2, "questions": 20 }
+      ],
+      "scoring_rule": "ارزیابی چندرشته‌ای حقوقی - روانشناختی جهت داوری در دادگاه‌های خانواده"
+    },
+    {
+      "id": "exam_masters_phd_law",
+      "title": "کنکور کارشناسی ارشد و دکتری تخصصی حقوق",
+      "organizer": "سازمان سنجش آموزش کشور",
+      "law_basis": "وزارت علوم، تحقیقات و فناوری",
+      "courses": [
+        { "name": "حقوق مدنی تخصصی", "coefficient": 3, "questions": 20 },
+        { "name": "حقوق تجارت پیشرفته", "coefficient": 2, "questions": 20 },
+        { "name": "متون حقوقی به زبان انگلیسی", "coefficient": 2, "questions": 20 },
+        { "name": "متون فقه تحلیلی", "coefficient": 2, "questions": 20 },
+        { "name": "آیین دادرسی مدنی پیشرفته", "coefficient": 1, "questions": 20 }
+      ],
+      "scoring_rule": "تراز علمی کشوری + مصاحبه دانشگاه‌های سطح یک (تهران، بهشتی، تربیت مدرس)"
+    }
+  ]
+}

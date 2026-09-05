@@ -1,17 +1,17 @@
 {
   "system": "Chatre Danesh & HaqYar KAG Legal Knowledge Graph",
-  "version": "2.0.0",
-  "graph_type": "Directed Attributed Legal Ontology & Rule Graph",
+  "version": "2.5.0-Advanced",
+  "graph_type": "Directed Attributed Legal Ontology & Multi-Skill Graph",
   "nodes_count": 25,
   "edges_count": 35,
   "entities": [
     {
       "id": "node_civil_contract",
       "type": "LEGAL_INSTITUTION",
-      "name": "عقد لازم و تعهدات قراردادی",
+      "name": "عقد لازم و اصل لزوم قراردادها",
       "statute": "قانون مدنی",
       "core_article": "ماده ۱۰ و ماده ۲۱۹",
-      "keywords": ["قرارداد", "عقد لازم", "اصالة اللزوم", "آزادی اراده"]
+      "keywords": ["قرارداد", "عقد لازم", "اصالة اللزوم", "آزادی اراده", "حاکمیت اراده"]
     },
     {
       "id": "node_trap_401",
@@ -19,7 +19,23 @@
       "name": "خیار شرط بدون مدت (تله ماده ۴۰۱)",
       "statute": "قانون مدنی",
       "core_article": "ماده ۴۰۱",
-      "keywords": ["خیار شرط", "مدت معین", "بطلان شرط", "بطلان عقد", "غرری"]
+      "keywords": ["خیار شرط", "مدت معین", "بطلان شرط", "بطلان عقد", "غرری", "401", "۴۰۱"]
+    },
+    {
+      "id": "node_condition_types",
+      "type": "LEGAL_INSTITUTION",
+      "name": "اقسام شروط ضمن عقد (صحیح، باطل، مبطل)",
+      "statute": "قانون مدنی",
+      "core_article": "مواد ۲۳۲ الی ۲۳۴",
+      "keywords": ["شرط صفت", "شرط نتیجه", "شرط فعل", "شرط مجهول", "شرط نامشروع", "232", "233", "234", "۲۳۲", "۲۳۳", "۲۳۴"]
+    },
+    {
+      "id": "node_tlaf_mabi",
+      "type": "LEGAL_DOCTRINE",
+      "name": "تلف مبیع قبل از قبض و ضمان معاوضی",
+      "statute": "قانون مدنی",
+      "core_article": "ماده ۳۸۷",
+      "keywords": ["تلف مبیع", "قبل از قبض", "انفساخ عقد", "ضمان معاوضی", "387", "۳۸۷"]
     },
     {
       "id": "node_possession_rule",
@@ -27,15 +43,23 @@
       "name": "اماره تصرف و قاعده ید",
       "statute": "قانون مدنی و اصول فقه",
       "core_article": "ماده ۳۵ و ماده ۳۰۰",
-      "keywords": ["اماره تصرف", "قاعده ید", "تعارض تصرف", "مالکیت"]
+      "keywords": ["اماره تصرف", "قاعده ید", "تعارض تصرف", "مالکیت", "35", "300", "۳۵", "۳۰۰"]
     },
     {
       "id": "node_civil_procedure_107",
       "type": "PROCEDURAL_TERMINATION",
-      "name": "استرداد دادخواست و دعوا (ماده ۱۰۷)",
+      "name": "استرداد دادخواست، دعوا و سقوط دعوا",
       "statute": "آیین دادرسی مدنی",
       "core_article": "ماده ۱۰۷",
-      "keywords": ["ابطال دادخواست", "رد دعوا", "سقوط دعوا", "ختم مذاکرات"]
+      "keywords": ["ابطال دادخواست", "رد دعوا", "سقوط دعوا", "ختم مذاکرات", "107", "۱۰۷"]
+    },
+    {
+      "id": "node_appeal_deadlines",
+      "type": "PROCEDURAL_TIMELINE",
+      "name": "مواعد دادرسی، تجدیدنظر و واخواهی",
+      "statute": "آیین دادرسی مدنی",
+      "core_article": "مواد ۳۰۵، ۳۳۶ و ۴۴۲",
+      "keywords": ["تجدیدنظرخواهی", "مهلت ۲۰ روز", "واخواهی", "فرجام‌خواهی", "حساب مواعد", "305", "336", "۳۰۵", "۳۳۶"]
     },
     {
       "id": "node_peace_court",
@@ -43,7 +67,7 @@
       "name": "دادگاه صلح و نصاب صلاحیت‌ها",
       "statute": "قانون جدید شوراهای حل اختلاف ۱۴۰۲",
       "core_article": "ماده ۱۱ و ۱۲",
-      "keywords": ["دادگاه صلح", "نصاب ۱۰۰ میلیون", "تصرف عدوانی", "حصر وراثت", "شورای حل اختلاف"]
+      "keywords": ["دادگاه صلح", "نصاب ۱۰۰ میلیون", "تصرف عدوانی", "حصر وراثت", "شورای حل اختلاف", "صلح", "11", "12", "۱۱", "۱۲"]
     },
     {
       "id": "node_sayad_check_23",
@@ -51,7 +75,7 @@
       "name": "اجراییه مستقیم چک صیادی (ماده ۲۳)",
       "statute": "قانون صدور چک",
       "core_article": "ماده ۲۳ اصلاحی ۱۳۹۷",
-      "keywords": ["چک صیادی", "اجراییه مستقیم", "گواهی عدم پرداخت", "مسدودی حساب"]
+      "keywords": ["چک صیادی", "اجراییه مستقیم", "گواهی عدم پرداخت", "مسدودی حساب", "سامانه پیچک", "23", "۲۳"]
     },
     {
       "id": "node_istishab",
@@ -59,7 +83,7 @@
       "name": "اصل استصحاب و بقای حالت سابقه",
       "statute": "اصول فقه",
       "core_article": "قاعده لاتنقض الیقین بالشک",
-      "keywords": ["استصحاب", "یقین سابق", "شک لاحق", "اصل صحت"]
+      "keywords": ["استصحاب", "یقین سابق", "شک لاحق", "اصل صحت", "استصحاب موضوعی", "استصحاب حکمی"]
     },
     {
       "id": "node_precedent_811",
@@ -67,7 +91,7 @@
       "name": "ضمان درک و بهای روز مبیع مستحق‌للغیر",
       "statute": "آراء وحدت رویه",
       "core_article": "رای وحدت رویه ۸۱۱ و ۸۲۸",
-      "keywords": ["ضمان درک", "مستحق للغیر", "بهای روز", "کاهش ارزش ثمن"]
+      "keywords": ["ضمان درک", "مستحق للغیر", "بهای روز", "کاهش ارزش ثمن", "811", "828", "۸۱۱", "۸۲۸"]
     },
     {
       "id": "node_facilitation_law",
@@ -75,7 +99,71 @@
       "name": "تراز و حدنصاب قبولی آزمون وکالت",
       "statute": "قانون تسهیل صدور مجوزهای کسب‌وکار",
       "core_article": "ماده ۵ اصلاحی",
-      "keywords": ["قانون تسهیل", "تراز ۱ درصد برتر", "حدنصاب ۷۰ درصد", "ایثارگران ۶۰ درصد"]
+      "keywords": ["قانون تسهیل", "تراز ۱ درصد برتر", "حدنصاب ۷۰ درصد", "ایثارگران ۶۰ درصد", "تسهیل"]
+    },
+    {
+      "id": "node_penal_gradations",
+      "type": "PENAL_SYSTEM",
+      "name": "درجات هشت‌گانه مجازات‌های تعزیری",
+      "statute": "قانون مجازات اسلامی",
+      "core_article": "ماده ۱۹",
+      "keywords": ["درجه ۱ تا ۸", "حبس تعزیری", "مرور زمان", "تخفیف مجازات", "19", "۱۹"]
+    },
+    {
+      "id": "node_penal_attempt",
+      "type": "PENAL_SYSTEM",
+      "name": "شروع به جرم و انصراف ارادی",
+      "statute": "قانون مجازات اسلامی",
+      "core_article": "ماده ۱۲۲ الی ۱۲۴",
+      "keywords": ["شروع به جرم", "انصراف ارادی", "عملیات اجرایی", "122", "۱۲۲"]
+    },
+    {
+      "id": "node_penal_concurrence",
+      "type": "PENAL_SYSTEM",
+      "name": "تعدد مادی و معنوی جرایم و تشدید مجازات",
+      "statute": "قانون مجازات اسلامی",
+      "core_article": "ماده ۱۳۱ و ۱۳۴",
+      "keywords": ["تعدد جرم", "مجازات اشد", "تعدد اعتباری", "قانون کاهش حبس", "131", "134", "۱۳۱", "۱۳۴"]
+    },
+    {
+      "id": "node_joint_liability_papers",
+      "type": "COMMERCIAL_LAW",
+      "name": "مسئولیت تضامنی در اسناد تجارتی",
+      "statute": "قانون تجارت",
+      "core_article": "ماده ۲۴۹ و ۳۱۴",
+      "keywords": ["مسئولیت تضامنی", "برات", "سفته", "ظهرنویس", "واخواست ۱۰ روزه", "249", "۲۴۹"]
+    },
+    {
+      "id": "node_bankruptcy_suspension",
+      "type": "COMMERCIAL_LAW",
+      "name": "توقف تاجر و بطلان معاملات دوران توقف",
+      "statute": "قانون تجارت",
+      "core_article": "ماده ۴۱۲ و ۴۲۳",
+      "keywords": ["ورشکستگی", "دوران توقف", "بطلان معاملات", "مدیر تصفیه", "412", "423", "۴۱۲", "۴۲۳"]
+    },
+    {
+      "id": "node_landlord_tenant_1376",
+      "type": "REAL_ESTATE_LAW",
+      "name": "تخلیه فوری املاک استیجاری و سرقفلی",
+      "statute": "قانون روابط موجر و مستاجر ۱۳۷۶",
+      "core_article": "ماده ۲ و ۳ قانون ۷۶",
+      "keywords": ["تخلیه فوری", "دو شاهد", "سرقفلی", "حق کسب و پیشه", "۱۳۷۶", "1376"]
+    },
+    {
+      "id": "node_family_mahr_110",
+      "type": "FAMILY_LAW",
+      "name": "مهریه تا سقف ۱۱۰ سکه و اعمال حبس",
+      "statute": "قانون حمایت خانواده ۱۳۹۱",
+      "core_article": "ماده ۲۲",
+      "keywords": ["مهریه ۱۱۰ سکه", "حبس مهریه", "اعسار از پرداخت", "شروط سند ازدواج", "110", "۱۱۰"]
+    },
+    {
+      "id": "node_sana_electronic_notice",
+      "type": "PROCEDURAL_TECH",
+      "name": "ابلاغ الکترونیک در سامانه ثنا و مواعد قانونی",
+      "statute": "آیین‌نامه ابلاغ الکترونیک و آ.د.ک",
+      "core_article": "ماده ۶۵۵ ق.آ.د.ک",
+      "keywords": ["سامانه ثنا", "ابلاغ قانونی", "ابلاغ واقعی", "رویت پیام", "655", "۶۵۵"]
     }
   ],
   "relations": [
@@ -83,7 +171,19 @@
       "from": "node_trap_401",
       "to": "node_civil_contract",
       "relation": "FATAL_EXCEPTION_TO",
-      "description": "عدم ذکر مدت در شرط خیار استثنائاً موجب سرایت بطلان به اصل عقد می‌شود."
+      "description": "عدم ذکر مدت در شرط خیار استثنائاً موجب سرایت بطلان به اصل عقد می‌شود (ماده ۴۰۱ ق.م)."
+    },
+    {
+      "from": "node_condition_types",
+      "to": "node_civil_contract",
+      "relation": "CONTRACTUAL_ANCILLARY_RULE",
+      "description": "شروط باطل مفسد (ماده ۲۳۳) مانند شرط نامقدور جهل‌آور یا شرط خلاف مقتضای ذات عقد، اصل عقد را باطل می‌کنند."
+    },
+    {
+      "from": "node_tlaf_mabi",
+      "to": "node_civil_contract",
+      "relation": "STATUTORY_DISSOLUTION_INفسَاخ",
+      "description": "تلف مبیع قبل از تسلیم باعث انفساخ خودبه‌خودی عقد و استرداد ثمن می‌شود (ماده ۳۸۷ ق.م)."
     },
     {
       "from": "node_civil_procedure_107",
@@ -92,10 +192,52 @@
       "description": "استرداد دادخواست یا دعوا رسیدگی قضایی قرارداد را با قرارهای شکلی پایان می‌دهد."
     },
     {
+      "from": "node_appeal_deadlines",
+      "to": "node_civil_procedure_107",
+      "relation": "TIME_WINDOW_CALCULATION",
+      "description": "مهلت تجدیدنظرخواهی ۲۰ روز از تاریخ ابلاغ واقعی یا انقضای مهلت واخواهی محاسبه می‌شود."
+    },
+    {
+      "from": "node_peace_court",
+      "to": "node_civil_procedure_107",
+      "relation": "STATUTORY_VENUE_EXCLUSIVE",
+      "description": "دعاوی مالی تا ۱۰۰ میلیون تومان مستقیماً در صلاحیت دادگاه صلح است."
+    },
+    {
       "from": "node_sayad_check_23",
       "to": "node_civil_procedure_107",
       "relation": "BYPASSES_SUBSTANTIVE_TRIAL",
       "description": "اجراییه مستقیم ماده ۲۳ نیاز به تشکیل جلسه دادرسی و صدور حکم بدوی را منتفی می‌سازد."
+    },
+    {
+      "from": "node_joint_liability_papers",
+      "to": "node_sayad_check_23",
+      "relation": "ENFORCEMENT_COLLATERAL",
+      "description": "مسئولیت تضامنی صادرکننده و ظهرنویس‌ها در صورت رعایت مهلت واخواست اعمال می‌شود."
+    },
+    {
+      "from": "node_bankruptcy_suspension",
+      "to": "node_civil_contract",
+      "relation": "NULLIFIES_POST_STOPPAGE_DEALS",
+      "description": "معاملات تاجر ورشکسته پس از تاریخ توقف به استناد ماده ۴۲۳ قانون تجارت باطل است."
+    },
+    {
+      "from": "node_landlord_tenant_1376",
+      "to": "node_civil_contract",
+      "relation": "ACCELERATED_EVICTION_CRITERIA",
+      "description": "تخلیه فوری ملک ظرف یک هفته منوط به داشتن مدت و امضای دو شاهد در قرارداد عادی است."
+    },
+    {
+      "from": "node_family_mahr_110",
+      "to": "node_civil_contract",
+      "relation": "RESTRICTS_DETENTION_REMEDY",
+      "description": "بازداشت زوج بابت مهریه صرفاً تا سقف ۱۱۰ سکه تمام بهار آزادی مجاز است."
+    },
+    {
+      "from": "node_sana_electronic_notice",
+      "to": "node_appeal_deadlines",
+      "relation": "STARTS_LEGAL_COUNTDOWN",
+      "description": "تاریخ ثبت در حساب کاربری ثنا مبدا شروع مواعد ۲۰ روزه تجدیدنظر و ۱۰ روزه اجرای احکام است."
     },
     {
       "from": "node_istishab",
@@ -108,12 +250,6 @@
       "to": "node_civil_contract",
       "relation": "MODIFIES_DAMAGES_FORMULA",
       "description": "خسارت بطلان معامله را از ثمن اسمی به قیمت تورمی روز ملک ارتقا می‌دهد."
-    },
-    {
-      "from": "node_peace_court",
-      "to": "node_civil_procedure_107",
-      "relation": "STATUTORY_VENUE_EXCLUSIVE",
-      "description": "دعاوی مالی تا ۱۰۰ میلیون مستقیماً به دادگاه صلح بدون مراجعه به دادگاه عمومی ارجاع می‌شوند."
     }
   ]
 }

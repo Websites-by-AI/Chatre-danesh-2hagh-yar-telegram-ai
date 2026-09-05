@@ -7,14 +7,14 @@ const API_BASE = `https://api.telegram.org/bot${TELEGRAM_TOKEN}`;
 const BOT_PERSISTENT_KEYBOARD = {
   keyboard: [
     [{ text: "⚖️ آزمون وکالت و تست روزانه" }, { text: "📊 کارنامه و شبیه‌ساز تسهیل" }],
-    [{ text: "🪤 تله‌های تستی مواد قانون" }, { text: "🧠 مشاوره با هوش مصنوعی KAG" }],
+    [{ text: "🪤 تله‌های تستی مواد قانون" }, { text: "🧠 جعبه‌ابزار مهارت‌های KAG" }],
     [{ text: "🌐 ورود به پرتال چتر دانش" }, { text: "ℹ️ راهنما و پشتیبانی" }]
   ],
   resize_keyboard: true,
   is_persistent: true
 };
 
-// منوی پنجره‌ای شیشه‌ای (Inline Keyboard)
+// منوی پنجره‌ای شیشه‌ای اصلی
 const BOT_INLINE_WINDOWS_MENU = {
   inline_keyboard: [
     [
@@ -26,12 +26,27 @@ const BOT_INLINE_WINDOWS_MENU = {
       { text: "📈 تحلیل ساختار آزمون", callback_data: "menu:structure" }
     ],
     [
-      { text: "⚖️ محاسبه تراز قانون تسهیل", callback_data: "menu:facilitate" },
-      { text: "🧠 استنتاج حقوقی KAG (۲۰ کتاب)", callback_data: "menu:kag" }
+      { text: "📅 محاسبه مواعد دادرسی", callback_data: "menu:deadlines" },
+      { text: "🏛️ تشخیص دادگاه صلح", callback_data: "menu:courts" }
+    ],
+    [
+      { text: "🎙️ مصاحبه شفاهی قضاوت", callback_data: "menu:oral" },
+      { text: "⚖️ شبیه‌ساز قانون تسهیل", callback_data: "menu:facilitate" }
     ],
     [
       { text: "🌐 ورود مستقیم به سایت چتر دانش", callback_data: "menu:sitelogin" }
     ]
+  ]
+};
+
+// منوی مواعد قانونی
+const BOT_DEADLINES_INLINE = {
+  inline_keyboard: [
+    [{ text: "⏳ مهلت تجدیدنظرخواهی (۲۰ روز)", callback_data: "dl:appeal" }],
+    [{ text: "⏳ مهلت واخواهی احکام غیابی (۲۰ روز)", callback_data: "dl:protest" }],
+    [{ text: "⏳ مهلت اجرای احکام و توقیف (۱۰ روز)", callback_data: "dl:execution" }],
+    [{ text: "⏳ مواعد چک صیادی و واخواست", callback_data: "dl:sayad_check" }],
+    [{ text: "🔙 بازگشت به منوی اصلی", callback_data: "menu:main" }]
   ]
 };
 
@@ -46,7 +61,7 @@ const BOT_LESSONS_INLINE = {
   ]
 };
 
-// منوی تحلیل تله‌های تستی
+// منوی تله‌های تستی
 const BOT_TRAPS_INLINE = {
   inline_keyboard: [
     [{ text: "⚠️ تله ماده ۴۰۱ (خیار شرط بدون مدت)", callback_data: "trap:401" }],
@@ -56,7 +71,7 @@ const BOT_TRAPS_INLINE = {
   ]
 };
 
-// بارگذاری بانک ۱۰۵ تستی و پایگاه KAG
+// بارگذاری دیتابیس‌ها
 let examBank = [];
 let lawBooksCorpus = [];
 let kagGraph = null;
@@ -65,15 +80,17 @@ try {
   examBank = JSON.parse(fs.readFileSync('/home/user/chatre-danesh-repo/huggingface-static/data/exams.json', 'utf-8'));
   lawBooksCorpus = JSON.parse(fs.readFileSync('/home/user/chatre-danesh-repo/huggingface-static/data/law-books-corpus.json', 'utf-8')).books || [];
   kagGraph = JSON.parse(fs.readFileSync('/home/user/chatre-danesh-repo/huggingface-static/data/legal-knowledge-graph.json', 'utf-8'));
-  console.log(`[INIT] Loaded ${examBank.length} questions, ${lawBooksCorpus.length} law books, and KAG Knowledge Graph.`);
+  console.log(`[INIT] Loaded ${examBank.length} questions, ${lawBooksCorpus.length} law books, and 25-node KAG Knowledge Graph.`);
 } catch (e) {
   console.error("[INIT] Failed to load databases:", e.message);
 }
 
-// موتور استنتاج KAG بر روی ۲۰ کتاب و گراف دانش
+// تابع استنتاج KAG
 function executeKagReasoning(userText) {
-  const norm = (s) => (s || "").replace(/[يك]/g, c => c === 'ي' ? 'ی' : 'ک').replace(/[\u200c\u200f\s]+/g, ' ').trim().toLowerCase();
-  const qNorm = norm(userText);
+  const faDigits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+  let qNorm = userText;
+  for (let i = 0; i < 10; i++) qNorm = qNorm.replaceAll(faDigits[i], i.toString());
+  qNorm = qNorm.replace(/[يك]/g, c => c === 'ي' ? 'ی' : 'ک').replace(/[\u200c\u200f\s]+/g, ' ').trim().toLowerCase();
   const tokens = qNorm.split(/\s+/).filter(t => t.length >= 2);
 
   const matchedEntities = [];
@@ -81,7 +98,7 @@ function executeKagReasoning(userText) {
 
   if (kagGraph && kagGraph.entities) {
     for (const ent of kagGraph.entities) {
-      if (ent.keywords.some(kw => qNorm.includes(norm(kw))) || qNorm.includes(norm(ent.name)) || qNorm.includes(norm(ent.core_article))) {
+      if (ent.keywords.some(kw => qNorm.includes(kw.toLowerCase())) || qNorm.includes(ent.name.toLowerCase()) || qNorm.includes(ent.core_article.toLowerCase())) {
         matchedEntities.push(ent);
         matchedEntityIds.add(ent.id);
       }
@@ -100,7 +117,7 @@ function executeKagReasoning(userText) {
   const matchedArticles = [];
   for (const book of lawBooksCorpus) {
     for (const art of (book.key_articles || [])) {
-      const artHay = norm(`${art.article} ${art.subject} ${art.text} ${art.doctrine} ${(art.exceptions || []).join(' ')}`);
+      const artHay = `${art.article} ${art.subject} ${art.text} ${art.doctrine} ${(art.exceptions || []).join(' ')}`.toLowerCase();
       let score = 0;
       for (const t of tokens) {
         if (artHay.includes(t)) score++;
@@ -113,7 +130,7 @@ function executeKagReasoning(userText) {
 
   matchedArticles.sort((a, b) => b.score - a.score);
 
-  let resp = `🧠 *پاسخ استنتاجی هوش مصنوعی حقوقی چتر دانش (مبتنی بر مدل KAG & RAG)*\n`;
+  let resp = `🧠 *پاسخ استنتاجی هوش مصنوعی حقوقی چتر دانش (مدل پیشرفته KAG & RAG)*\n`;
   resp += `────────────────────────────\n`;
 
   if (matchedEntities.length > 0) {
@@ -141,13 +158,12 @@ function executeKagReasoning(userText) {
       resp += `⚠️ *استثنائات:* ${top.art.exceptions.join('، ')}\n`;
     }
   } else {
-    resp += `برای جستجوی دقیق‌تر می‌توانید شماره ماده قانون (مثلاً ماده ۴۰۱ ق.م، ماده ۱۰۷ ق.آ.د.م، ماده ۲۳ چک یا ماده ۱۱ صلح) را ارسال فرمایید.`;
+    resp += `کافیست موضوع حقوقی یا ماده قانون مدنظر (مثل ماده ۴۰۱ ق.م، ماده ۱۰۷ ق.آ.د.م، چک صیادی ماده ۲۳ یا صلاحیت دادگاه صلح) را بنویسید.`;
   }
 
   return resp;
 }
 
-// وضعیت آزمون جاری کاربران
 const userQuizSession = new Map();
 
 async function sendTelegram(method, payload) {
@@ -178,7 +194,7 @@ async function handleUpdate(update) {
     const text = (msg.text || "").trim();
 
     if (text === "/start" || text === "منوی اصلی" || text === "شروع مجدد") {
-      const welcome = `سلام و احترام به جامعه حقوقی چتر دانش و حق‌یار ⚖️\n\nپایگاه هوش مصنوعی حقوقی با ۲۰ کتاب قانون مرجع ایران، گراف دانش KAG، شبیه‌ساز قانون تسهیل و بانک تست‌های وکالت آماده خدمت به شماست.\n\nلطفاً یکی از خدمات زیر را انتخاب نمایید:`;
+      const welcome = `سلام و احترام به خانواده بزرگ حقوقی چتر دانش و حق‌یار ⚖️\n\nبه سامانه هوشمند با ۲۰ کتاب قانون مرجع ایران، گراف دانش KAG، محاسبه‌گر مواعد، شبیه‌ساز مصاحبه و آزمون وکالت خوش آمدید.\n\nلطفاً یکی از خدمات زیر را انتخاب نمایید:`;
       await sendTelegram("sendMessage", {
         chat_id: chatId,
         text: welcome,
@@ -217,12 +233,13 @@ async function handleUpdate(update) {
       });
     }
 
-    if (text === "🧠 مشاوره با هوش مصنوعی KAG" || text === "/smart" || text === "/chat" || text === "/kag") {
-      const kagInfo = `🧠 *سامانه استنتاج حقوقی KAG (مبتنی بر ۲۰ کتاب مرجع)*\n\nپایگاه هوش مصنوعی مسلط به:\n۱) قانون مدنی (۱۳۳۵ ماده)\n۲) آیین دادرسی مدنی (۵۲۹ ماده)\n۳) قانون مجازات اسلامی ۱۳۹۲\n۴) آیین دادرسی کیفری\n۵) قانون تجارت و اسناد برات و چک\n۶) قانون دادگاه‌های صلح ۱۴۰۲\n۷) چک صیادی و ثبت اسناد و ...\n\n💬 کافیست سوال حقوقی یا ماده قانون مدنظر خود را همینجا تایپ کنید.`;
+    if (text === "🧠 جعبه‌ابزار مهارت‌های KAG" || text === "/skills" || text === "/kag") {
+      const skillsMsg = `🧠 *جعبه‌ابزار مهارت‌های تخصصی هوش مصنوعی KAG:*\n\n۱) 📅 محاسبه مواعد دادرسی و تجدیدنظر (/deadlines)\n۲) 🏛️ تشخیص صلاحیت دادگاه صلح و مراجع قضایی (/courts)\n۳) 🎙️ کارگاه شفاهی و مصاحبه علمی قضاوت و وکالت (/oral)\n۴) 🪤 تحلیل تله‌های تستی مواد قانون (/traps)\n۵) ⚖️ استنتاج بر پایه ۲۰ کتاب قانون مرجع ایران\n\nکافیست از منوی زیر استفاده کنید یا سوال خود را تایپ فرمایید:`;
       return await sendTelegram("sendMessage", {
         chat_id: chatId,
-        text: kagInfo,
-        parse_mode: "Markdown"
+        text: skillsMsg,
+        parse_mode: "Markdown",
+        reply_markup: BOT_INLINE_WINDOWS_MENU
       });
     }
 
@@ -245,11 +262,11 @@ async function handleUpdate(update) {
     if (text === "ℹ️ راهنما و پشتیبانی" || text === "/help") {
       return await sendTelegram("sendMessage", {
         chat_id: chatId,
-        text: `ℹ️ *راهنمای جامع ربات چتر دانش و مدل KAG*\n\n🔹 /quiz - شروع آزمون و تست تصادفی\n🔹 /traps - تحلیل تله‌های تستی آزمون وکالت\n🔹 /kag - مشاوره استنتاجی با ۲۰ کتاب قانون\n🔹 /facilitate - محاسبه تراز قانون تسهیل\n🔹 /site - ورود ۱-کلیکی به وبسایت\n\nتلفن پشتیبانی مرکزی: ۰۲۱-۶۶۴۱۴۸۴۸\nوبسایت رسمی: https://chattredanesh.ir`
+        text: `ℹ️ *راهنمای جامع ربات چتر دانش و جعبه‌ابزار KAG*\n\n🔹 /quiz - شروع آزمون وکالت\n🔹 /skills - جعبه‌ابزار مهارت‌های KAG\n🔹 /deadlines - محاسبه مواعد قانونی\n🔹 /traps - تله‌های تستی آزمون\n🔹 /oral - مصاحبه شفاهی قضاوت و وکالت\n🔹 /facilitate - شبیه‌ساز قانون تسهیل\n🔹 /site - ورود ۱-کلیکی به وبسایت\n\nتلفن پشتیبانی مرکزی: ۰۲۱-۶۶۴۱۴۸۴۸\nوبسایت رسمی: https://chattredanesh.ir`
       });
     }
 
-    // استنتاج KAG بر روی متن پیام کاربر
+    // پاسخ استنتاجی KAG
     const kagResponse = executeKagReasoning(text);
     return await sendTelegram("sendMessage", {
       chat_id: chatId,
@@ -264,7 +281,7 @@ async function handleUpdate(update) {
     });
   }
 
-  // مدیریت دکمه‌های شیشه‌ای
+  // مدیریت کلیک دکمه‌های شیشه‌ای
   if (update.callback_query) {
     const cb = update.callback_query;
     const chatId = cb.message.chat.id;
@@ -280,12 +297,76 @@ async function handleUpdate(update) {
       });
     }
 
-    if (data === "menu:kag") {
-      const kagInfo = `🧠 *سامانه استنتاج حقوقی KAG (مبتنی بر ۲۰ کتاب مرجع)*\n\nپایگاه هوش مصنوعی مسلط به:\n۱) قانون مدنی (۱۳۳۵ ماده)\n۲) آیین دادرسی مدنی (۵۲۹ ماده)\n۳) قانون مجازات اسلامی ۱۳۹۲\n۴) آیین دادرسی کیفری\n۵) قانون تجارت و اسناد برات و چک\n۶) قانون دادگاه‌های صلح ۱۴۰۲\n۷) چک صیادی و ثبت اسناد و ...\n\n💬 کافیست سوال حقوقی یا ماده قانون مدنظر خود را همینجا تایپ کنید.`;
+    if (data === "menu:deadlines") {
       return await sendTelegram("sendMessage", {
         chat_id: chatId,
-        text: kagInfo,
-        parse_mode: "Markdown"
+        text: "📅 *محاسبه‌گر مواعد قانونی و مهلت‌های دادرسی:*\n\nکدام موعد قانونی را می‌خواهید محاسبه کنید؟",
+        parse_mode: "Markdown",
+        reply_markup: BOT_DEADLINES_INLINE
+      });
+    }
+
+    if (data.startsWith("dl:")) {
+      const type = data.replace("dl:", "");
+      let info = "";
+      if (type === "appeal") {
+        info = "⏳ *مهلت تجدیدنظرخواهی حقوقی و کیفری:*\n\n• مهلت برای مقیمین ایران: **۲۰ روز** (مقیمین خارج: ۶۰ روز)\n• مستند: ماده ۳۳۶ ق.آ.د.م و ۴۳۱ ق.آ.د.ک\n• مبدا: تاریخ ابلاغ دادنامه در سامانه ثنا\n• قاعده: روز ابلاغ و روز اقدام جزء مدت محاسبه نمی‌شود.";
+      } else if (type === "protest") {
+        info = "⏳ *مهلت واخواهی احکام غیابی:*\n\n• مهلت: **۲۰ روز** از تاریخ ابلاغ واقعی به محکوم‌علیه\n• مستند: ماده ۳۰۵ ق.آ.د.م\n• اثر: واخواهی اجرای حکم غیابی را متوقف می‌سازد.";
+      } else if (type === "execution") {
+        info = "⏳ *مهلت اجرای اختیاری اجراییه دادگاه:*\n\n• مهلت: **۱۰ روز** از تاریخ ابلاغ اجراییه در ثنا\n• مستند: ماده ۳۴ قانون اجرای احکام مدنی\n• اقدام: پرداخت محکوم‌به، معرفی مال یا ثبت دادخواست اعسار.";
+      } else if (type === "sayad_check") {
+        info = "⏳ *مواعد چک صیادی و واخواست:*\n\n• صدور اجراییه مستقیم ماده ۲۳: بدون انقضای مدت علیه صادرکننده\n• حفظ مسئولیت تضامنی ظهرنویسان: دریافت گواهی ظرف ۱۵ روز از سررسید (ماده ۳۱۵ ق.ت).";
+      }
+      return await sendTelegram("sendMessage", {
+        chat_id: chatId,
+        text: info,
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: "📅 محاسبه موعد دیگر", callback_data: "menu:deadlines" }],
+            [{ text: "🔙 منوی اصلی", callback_data: "menu:main" }]
+          ]
+        }
+      });
+    }
+
+    if (data === "menu:courts") {
+      const courtsInfo = `🏛️ *تشخیص صلاحیت دادگاه‌های صلح و مراجع قضایی (قانون ۱۴۰۲)*\n\n۱) **دادگاه صلح:**\n• کلیه دعاوی مالی تا سقف ۱۰۰ میلیون تومان (تا ۵۰ میلیون قطعی است)\n• دعاوی تصرف عدوانی، ممانعت از حق و حصر وراثت بدون سقف مالی\n• دعاوی تخلیه و تعدیل اجاره‌بها\n\n۲) **دادگاه عمومی حقوقی:**\n• دعاوی مالی بالاتر از ۱۰۰ میلیون تومان و دعاوی اسناد رسمی\n\n۳) **دیوان عدالت اداری:**\n• شکایات از اقدامات شهرداری‌ها، ادارات دولتی و ابطال آیین‌نامه‌ها`;
+      return await sendTelegram("sendMessage", {
+        chat_id: chatId,
+        text: courtsInfo,
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [[{ text: "🔙 بازگشت به منوی اصلی", callback_data: "menu:main" }]]
+        }
+      });
+    }
+
+    if (data === "menu:oral") {
+      const oralPrompt = `🎙️ *کارگاه شبیه‌ساز مصاحبه علمی و آزمون شفاهی وکالت/قضاوت*\n\n❓ *سناریوی قضیه حقوقی:*\n«فروشنده‌ای ملکی را با سند عادی می‌فروشد و خریدار نصف ثمن را می‌پردازد. قبل از تحویل ملک، شهرداری طرح تعریض خیابان را تصویب و ملک در مسیر تعریض قرار می‌گیرد. خریدار تقاضای فسخ و استرداد ثمن با نرخ تورم روز را دارد. آیا تقاضای او منطبق با قانون است؟ مستندات را بنویسید.»\n\n💡 پاسخ خود را بنویسید یا جهت مشاهده تحلیل روی دکمه زیر بزنید:`;
+      return await sendTelegram("sendMessage", {
+        chat_id: chatId,
+        text: oralPrompt,
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: "💡 مشاهده پاسخ و نکات کلیدی مصاحبه", callback_data: "oral_ans:1" }],
+            [{ text: "🔙 بازگشت به منوی اصلی", callback_data: "menu:main" }]
+          ]
+        }
+      });
+    }
+
+    if (data === "oral_ans:1") {
+      const oralAnalysis = `📋 *نکات کلیدی پاسخ مصاحبه شفاهی وکالت/قضاوت:*\n\n۱) طبق ماده ۳۸۷ و ۳۸۸ ق.م تعریض شهرداری در حکم عیب حقوقی قبل از قبض است و خریدار خیار تبعض صفقه یا فسخ دارد.\n۲) با توجه به رای وحدت رویه ۸۱۱ دیوان عالی کشور، در صورت تقصیر فروشنده کاهش ارزش ثمن با نرخ تورم بانک مرکزی قابل مطالبه است.\n۳) دادگاه صالح: دادگاه صلح یا عمومی بسته به نصاب مالی خواسته.`;
+      return await sendTelegram("sendMessage", {
+        chat_id: chatId,
+        text: oralAnalysis,
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [[{ text: "🔙 بازگشت به منوی اصلی", callback_data: "menu:main" }]]
+        }
       });
     }
 
@@ -455,7 +536,7 @@ async function serveRandomQuestion(chatId, subj = "all") {
 let lastUpdateId = 0;
 async function startLongPolling() {
   console.log("===================================================================");
-  console.log("🤖 موتور پاسخ‌دهی زنده ربات تلگرام چتر دانش با KAG فعال شد (@ChatreDanesh_Law_Bot)");
+  console.log("🤖 موتور هوشمند تلگرام با جعبه‌ابزار مهارت‌های KAG فعال شد (@ChatreDanesh_Law_Bot)");
   console.log("===================================================================");
 
   while (true) {

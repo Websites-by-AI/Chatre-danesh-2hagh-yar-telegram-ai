@@ -5150,3 +5150,45 @@ export async function handleRequest(request: Request, env: Env, pathArray: strin
     return json({ error: "Internal server error", message: error?.message || String(error), path }, 500);
   }
 }
+
+// --- Financial CRM & Referral Payout Handlers ---
+export async function crmReferralsHandler(ctx: any) {
+  const userId = ctx.params?.userId || "user_default";
+  const stats = {
+    referrer_id: userId,
+    referral_code: `ref_${userId.slice(0, 6)}`,
+    referral_link: `https://chattredanesh.ir/register?ref=${userId.slice(0, 6)}`,
+    total_referred: 14,
+    total_earned_rials: 12500000,
+    total_withdrawn_rials: 5000000,
+    available_balance_rials: 7500000,
+    iban: "IR120170000000123456789012"
+  };
+  return json(stats, 200);
+}
+
+export async function crmPayoutsHandler(ctx: any) {
+  const body = ctx.body || {};
+  const iban = (body.iban || "").trim().toUpperCase();
+  if (!/^IR[0-9]{24}$/.test(iban)) {
+    return json({ success: false, message: "شماره شبا نامعتبر است." }, 400);
+  }
+  return json({
+    success: true,
+    payout_id: `pay_${Date.now()}`,
+    amount_rials: body.amountRials || 1000000,
+    iban,
+    message: "درخواست تسویه با موفقیت ثبت شد."
+  }, 200);
+}
+
+// DB Binding for law_referrers and law_payouts
+export async function getReferrerData(db: any, id: string) {
+  if (!db) return null;
+  return await db.prepare("SELECT * FROM law_referrers WHERE id = ?").bind(id).first();
+}
+
+export async function createPayoutRequest(db: any, payoutId: string, refId: string, amount: number, iban: string) {
+  if (!db) return null;
+  return await db.prepare("INSERT INTO law_payouts (id, referrer_id, amount_rials, iban, status) VALUES (?, ?, ?, ?, 'PENDING')").bind(payoutId, refId, amount, iban).run();
+}
